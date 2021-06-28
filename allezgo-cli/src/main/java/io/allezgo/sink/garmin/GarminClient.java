@@ -11,7 +11,6 @@ import io.allezgo.client.ObjectHttpClient;
 import io.allezgo.client.Result;
 import io.allezgo.config.Configuration;
 import io.allezgo.sink.tcx.Tcx;
-
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -201,44 +200,44 @@ public final class GarminClient {
 
     public Result<List<GarminActivity>, HttpError> activities(int start, int limit) {
         return client.get(
-                base.path(
-                        "proxy",
-                        "activitylist-service",
-                        "activities",
-                        "search",
-                        "activities")
-                        .query("limit", limit)
-                        .query("start", start),
-                GarminActivitiesResponse.class,
-                "nk",
-                "NT",
-                "cookie",
-                session.get().toCookies())
+                        base.path(
+                                        "proxy",
+                                        "activitylist-service",
+                                        "activities",
+                                        "search",
+                                        "activities")
+                                .query("limit", limit)
+                                .query("start", start),
+                        GarminActivitiesResponse.class,
+                        "nk",
+                        "NT",
+                        "cookie",
+                        session.get().toCookies())
                 .mapResult(GarminActivitiesResponse::activities);
     }
 
     public Result<List<GarminGear>, HttpError> gear(GarminActivityId activityId) {
         return client.get(
-                base.path("proxy", "gear-service", "gear", "filterGear")
-                        .query("activityId", activityId),
-                GarminGearResponse.class,
-                "nk",
-                "NT",
-                "cookie",
-                session.get().toCookies())
+                        base.path("proxy", "gear-service", "gear", "filterGear")
+                                .query("activityId", activityId),
+                        GarminGearResponse.class,
+                        "nk",
+                        "NT",
+                        "cookie",
+                        session.get().toCookies())
                 .mapResult(GarminGearResponse::gear);
     }
 
     public Result<List<GarminGear>, HttpError> availableGear(LocalDate date, GarminUserId userId) {
         return client.get(
-                base.path("proxy", "gear-service", "gear", "filterGear")
-                        .query("availableGearDate", date)
-                        .query("userProfilePk", userId),
-                GarminGearResponse.class,
-                "nk",
-                "NT",
-                "cookie",
-                session.get().toCookies())
+                        base.path("proxy", "gear-service", "gear", "filterGear")
+                                .query("availableGearDate", date)
+                                .query("userProfilePk", userId),
+                        GarminGearResponse.class,
+                        "nk",
+                        "NT",
+                        "cookie",
+                        session.get().toCookies())
                 .mapResult(GarminGearResponse::gear);
     }
 
@@ -330,12 +329,12 @@ public final class GarminClient {
 
     public Result<GarminUserId, HttpError> userId() {
         return client.get(
-                base.path("proxy", "userprofile-service", "userprofile", "location"),
-                GarminUserLocationResponse.class,
-                "nk",
-                "NT",
-                "cookie",
-                session.get().toCookies())
+                        base.path("proxy", "userprofile-service", "userprofile", "location"),
+                        GarminUserLocationResponse.class,
+                        "nk",
+                        "NT",
+                        "cookie",
+                        session.get().toCookies())
                 .mapResult(GarminUserLocationResponse::userProfileId);
     }
 }

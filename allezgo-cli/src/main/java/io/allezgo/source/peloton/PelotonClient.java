@@ -6,9 +6,7 @@ import io.allezgo.client.HttpError;
 import io.allezgo.client.ObjectHttpClient;
 import io.allezgo.client.Result;
 import io.allezgo.config.Configuration;
-
 import java.net.URI;
-import java.util.Map;
 import java.util.function.Supplier;
 
 public final class PelotonClient {
