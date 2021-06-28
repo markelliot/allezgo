@@ -123,7 +123,7 @@ public final class Main {
      * Iterates through Garmin activities until either:
      *
      * <ol>
-     *   <li>we find this ride (or one within +/- 2 minutes of its start
+     *   <li>we find this ride (or one within +/- 2 minutes of its start)
      *   <li>we see at least one ride older than this one
      * </ol>
      */
