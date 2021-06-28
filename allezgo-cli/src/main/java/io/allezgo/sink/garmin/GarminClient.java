@@ -26,8 +26,7 @@ import java.util.function.Supplier;
 
 public final class GarminClient {
     private static final ObjectHttpClient client = new ObjectHttpClient();
-    private static final Endpoint.Base base =
-            Endpoint.of("https://connect.garmin.com/modern/");
+    private static final Endpoint.Base base = Endpoint.of("https://connect.garmin.com/modern/");
 
     private static final URI APP_URI = URI.create("https://connect.garmin.com/modern/");
     private static final URI LOGIN_URI =
