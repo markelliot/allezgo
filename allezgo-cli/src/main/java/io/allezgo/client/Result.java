@@ -48,7 +48,7 @@ public record Result<T, E>(T result, E error) {
         return error != null ? Optional.of(error) : Optional.empty();
     }
 
-    public <Exc extends Exception> T orElseThrow(Function<E, Exc> exceptionSupplier) throws Exc {
+    public <X extends Exception> T orElseThrow(Function<E, X> exceptionSupplier) throws X {
         if (error != null) {
             throw exceptionSupplier.apply(error);
         }
