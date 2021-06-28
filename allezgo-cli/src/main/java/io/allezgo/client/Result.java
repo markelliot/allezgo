@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import java.util.Optional;
 import java.util.function.Function;
 
+/** A Rust-inspired result-xor-error container. */
 public record Result<T, E>(T result, E error, boolean isError) {
     public static <T, E> Result<T, E> ok(T result) {
         return new Result<>(result, null, false);

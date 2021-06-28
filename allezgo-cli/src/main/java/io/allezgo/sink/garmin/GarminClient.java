@@ -1,6 +1,5 @@
 package io.allezgo.sink.garmin;
 
-import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
@@ -23,12 +22,14 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public final class GarminClient {
     private static final ObjectHttpClient client = new ObjectHttpClient();
-    private static final Endpoint base =
-            Endpoint.of(URI.create("https://connect.garmin.com/modern/"));
+    private static final Endpoint.Base base =
+            Endpoint.of("https://connect.garmin.com/modern/");
 
+    private static final URI APP_URI = URI.create("https://connect.garmin.com/modern/");
     private static final URI LOGIN_URI =
             URI.create(
                     "https://sso.garmin.com/sso/signin"
@@ -56,37 +57,36 @@ public final class GarminClient {
     /**
      * Performs a Garmin login.
      *
-     * <p>Garmin logins consist of the following sequence:</p>
-     * <ol>
-     *     <li>POST username and password to sso.garmin.com as if submitted by an embedded
-     *     login form. Note that we need to use the embedded form as otherwise the submission
-     *     requires a CSRF token that needs to be read by loading the login HTML and extracting
-     *     from the rendered login form. We avoid all the normal browser protections for CSRF
-     *     anyway since this is Java and not a browser.
+     * <p>Garmin logins consist of the following sequence:
      *
-     *     <p>Also note that the login URI includes a query parameter {@code consumeServiceTicket=false}
-     *     that seems to discard the need for us to do anything besides the next steps of
-     *     following redirects (without the parameter the redirects no longer guide the initialization
-     *     process).</p></li>
-     *     <li>Initialize the token and identify our load balancer by navigating to
-     *     connect.garmin.com/modern with all the cookies we obtained from the first step.</li>
-     *     <li>Follow some number of redirects that, in turn, seem to activate our token and
-     *     prime one of the load balancers to accept that token.</li>
-     *     <li>Extract the three cookies we need to have a live session with the Garmin API
-     *         <ul>
-     *             <li>{@code __cflb}: the load balancer that will accept the session</li>
-     *             <li>{@code SESSIONID}: the actual session</li>
-     *             <li>{@code GARMIN-SSO-GUID}: what appears to be a user-identifying token that goes
-     *             with {@code SESSIONID}</li>
-     *         </ul>
-     *     </li>
+     * <ol>
+     *   <li>POST username and password to sso.garmin.com as if submitted by an embedded login form.
+     *       Note that we need to use the embedded form as otherwise the submission requires a CSRF
+     *       token that needs to be read by loading the login HTML and extracting from the rendered
+     *       login form. We avoid all the normal browser protections for CSRF anyway since this is
+     *       Java and not a browser.
+     *       <p>Also note that the login URI includes a query parameter {@code
+     *       consumeServiceTicket=false} that seems to discard the need for us to do anything
+     *       besides the next steps of following redirects (without the parameter the redirects no
+     *       longer guide the initialization process).
+     *   <li>Initialize the token and identify our load balancer by navigating to
+     *       connect.garmin.com/modern with all the cookies we obtained from the first step.
+     *   <li>Follow some number of redirects that, in turn, seem to activate our token and prime one
+     *       of the load balancers to accept that token.
+     *   <li>Extract the three cookies we need to have a live session with the Garmin API
+     *       <ul>
+     *         <li>{@code __cflb}: the load balancer that will accept the session
+     *         <li>{@code SESSIONID}: the actual session
+     *         <li>{@code GARMIN-SSO-GUID}: what appears to be a user-identifying token that goes
+     *             with {@code SESSIONID}
+     *       </ul>
      * </ol>
      *
      * <p>The original implementation of this method tried to explicitly manage the cookies passed
      * from domain to domain, but ultimately degraded to passing all the cookies seen up to the next
      * page load, so this method dedicates a client and a cookie handler for each invocation and
      * simply grabs the final three cookies to load a session object rather than something more
-     * precise.</p>
+     * precise.
      */
     public Result<GarminSession, HttpError> login(String email, String password) {
         CookieManager cookieHandler =
@@ -121,7 +121,7 @@ public final class GarminClient {
             }
 
             int count = 0;
-            URI location = base.uri();
+            URI location = APP_URI;
             while (true) {
                 HttpResponse<String> initTicketResp =
                         client.send(
@@ -192,14 +192,13 @@ public final class GarminClient {
 
     public Result<GarminUploadResponse, HttpError> rawUploadTcx(Tcx tcx) {
         return client.upload(
-                base.path("proxy", "upload-service", "upload", ".tcx"),
+                base.path("proxy", "upload-service", "upload", ".tcx")
+                        .header("nk", "NT")
+                        .header("cookie", session.get().toCookies())
+                        .build(),
                 "activity.tcx",
                 tcx.value(),
-                GarminUploadResponse.class,
-                "nk",
-                "NT",
-                "cookie",
-                session.get().toCookies());
+                GarminUploadResponse.class);
     }
 
     public Result<GarminUpdateActivityResponse, HttpError> updateActivity(
@@ -222,15 +221,13 @@ public final class GarminClient {
     private Result<GarminUpdateActivityResponse, HttpError> updateActivityField(
             GarminActivityId activityId, Object request) {
         return client.post(
-                base.path("proxy", "activity-service", "activity", activityId.value()),
+                base.path("proxy", "activity-service", "activity", activityId.value())
+                        .header("x-http-method-override", "PUT")
+                        .header("nk", "NT")
+                        .header("cookie", session.get().toCookies())
+                        .build(),
                 request,
-                GarminUpdateActivityResponse.class,
-                "x-http-method-override",
-                "PUT",
-                "nk",
-                "NT",
-                "cookie",
-                session.get().toCookies());
+                GarminUpdateActivityResponse.class);
     }
 
     public Result<List<GarminActivity>, HttpError> activities(int start, int limit) {
@@ -242,24 +239,22 @@ public final class GarminClient {
                                         "search",
                                         "activities")
                                 .query("limit", limit)
-                                .query("start", start),
-                        GarminActivitiesResponse.class,
-                        "nk",
-                        "NT",
-                        "cookie",
-                        session.get().toCookies())
+                                .query("start", start)
+                                .header("nk", "NT")
+                                .header("cookie", session.get().toCookies())
+                                .build(),
+                        GarminActivitiesResponse.class)
                 .mapResult(GarminActivitiesResponse::activities);
     }
 
     public Result<List<GarminGear>, HttpError> gear(GarminActivityId activityId) {
         return client.get(
                         base.path("proxy", "gear-service", "gear", "filterGear")
-                                .query("activityId", activityId),
-                        GarminGearResponse.class,
-                        "nk",
-                        "NT",
-                        "cookie",
-                        session.get().toCookies())
+                                .query("activityId", activityId)
+                                .header("nk", "NT")
+                                .header("cookie", session.get().toCookies())
+                                .build(),
+                        GarminGearResponse.class)
                 .mapResult(GarminGearResponse::gear);
     }
 
@@ -267,12 +262,11 @@ public final class GarminClient {
         return client.get(
                         base.path("proxy", "gear-service", "gear", "filterGear")
                                 .query("availableGearDate", date)
-                                .query("userProfilePk", userId),
-                        GarminGearResponse.class,
-                        "nk",
-                        "NT",
-                        "cookie",
-                        session.get().toCookies())
+                                .query("userProfilePk", userId)
+                                .header("nk", "NT")
+                                .header("cookie", session.get().toCookies())
+                                .build(),
+                        GarminGearResponse.class)
                 .mapResult(GarminGearResponse::gear);
     }
 
@@ -324,52 +318,47 @@ public final class GarminClient {
             GarminActivityId activityId, GarminGearId gearUuid) {
         return client.post(
                 base.path(
-                        "proxy",
-                        "gear-service",
-                        "gear",
-                        "unlink",
-                        gearUuid.value(),
-                        "activity",
-                        activityId.value()),
+                                "proxy",
+                                "gear-service",
+                                "gear",
+                                "unlink",
+                                gearUuid.value(),
+                                "activity",
+                                activityId.value())
+                        .header("nk", "NT")
+                        .header("x-http-method-override", "PUT")
+                        .header("cookie", session.get().toCookies())
+                        .build(),
                 null,
-                GarminGear.class,
-                "nk",
-                "NT",
-                "x-http-method-override",
-                "PUT",
-                "cookie",
-                session.get().toCookies());
+                GarminGear.class);
     }
 
     private Result<GarminGear, HttpError> addGear(
             GarminActivityId activityId, GarminGearId gearUuid) {
         return client.post(
                 base.path(
-                        "proxy",
-                        "gear-service",
-                        "gear",
-                        "link",
-                        gearUuid.value(),
-                        "activity",
-                        activityId.value()),
+                                "proxy",
+                                "gear-service",
+                                "gear",
+                                "link",
+                                gearUuid.value(),
+                                "activity",
+                                activityId.value())
+                        .header("nk", "NT")
+                        .header("x-http-method-override", "PUT")
+                        .header("cookie", session.get().toCookies())
+                        .build(),
                 null,
-                GarminGear.class,
-                "nk",
-                "NT",
-                "x-http-method-override",
-                "PUT",
-                "cookie",
-                session.get().toCookies());
+                GarminGear.class);
     }
 
     public Result<GarminUserId, HttpError> userId() {
         return client.get(
-                        base.path("proxy", "userprofile-service", "userprofile", "location"),
-                        GarminUserLocationResponse.class,
-                        "nk",
-                        "NT",
-                        "cookie",
-                        session.get().toCookies())
+                        base.path("proxy", "userprofile-service", "userprofile", "location")
+                                .header("nk", "NT")
+                                .header("cookie", session.get().toCookies())
+                                .build(),
+                        GarminUserLocationResponse.class)
                 .mapResult(GarminUserLocationResponse::userProfileId);
     }
 }

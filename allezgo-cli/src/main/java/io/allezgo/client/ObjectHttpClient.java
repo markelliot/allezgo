@@ -24,7 +24,7 @@ public final class ObjectHttpClient {
     private static final HttpClient httpClient = HttpClient.newBuilder().build();
 
     public <Request, Response> Result<Response, HttpError> post(
-            Endpoint endpoint, Request request, Class<Response> responseClass, String... headers) {
+            Endpoint endpoint, Request request, Class<Response> responseClass) {
         try {
             String reqStr = request != null ? mapper.writeValueAsString(request) : "";
 
@@ -34,10 +34,7 @@ public final class ObjectHttpClient {
                             .setHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8")
                             .setHeader(HttpHeaders.ACCEPT, "application/json")
                             .POST(HttpRequest.BodyPublishers.ofString(reqStr));
-            if (headers.length > 0) {
-                requestBuilder.headers(headers);
-            }
-
+            endpoint.headers().forEach(requestBuilder::setHeader);
             HttpResponse<String> httpResp =
                     httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
             if (httpResp.statusCode() == 200) {
@@ -53,18 +50,17 @@ public final class ObjectHttpClient {
     }
 
     public <Response> Result<Response, HttpError> get(
-            Endpoint endpoint, Class<Response> responseClass, String... headers) {
+            Endpoint endpoint, Class<Response> responseClass) {
         try {
+            HttpRequest.Builder requestBuilder =
+                    HttpRequest.newBuilder()
+                            .uri(endpoint.uri())
+                            .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
+                            .setHeader(HttpHeaders.ACCEPT, "application/json")
+                            .GET();
+            endpoint.headers().forEach(requestBuilder::setHeader);
             HttpResponse<String> httpResp =
-                    httpClient.send(
-                            HttpRequest.newBuilder()
-                                    .uri(endpoint.uri())
-                                    .setHeader(HttpHeaders.CONTENT_TYPE, "application/json")
-                                    .setHeader(HttpHeaders.ACCEPT, "application/json")
-                                    .headers(headers)
-                                    .GET()
-                                    .build(),
-                            HttpResponse.BodyHandlers.ofString());
+                    httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
             if (httpResp.statusCode() != 200) {
                 return Result.error(HttpError.of(httpResp));
             }
@@ -75,25 +71,21 @@ public final class ObjectHttpClient {
     }
 
     public <Response> Result<Response, HttpError> upload(
-            Endpoint endpoint,
-            String filename,
-            String fileContent,
-            Class<Response> responseClass,
-            String... headers) {
+            Endpoint endpoint, String filename, String fileContent, Class<Response> responseClass) {
         Forms.MultipartUpload upload = Forms.MultipartUpload.of(filename, fileContent);
 
         try {
+            HttpRequest.Builder requestBuilder =
+                    HttpRequest.newBuilder()
+                            .uri(endpoint.uri())
+                            .setHeader(
+                                    HttpHeaders.CONTENT_TYPE,
+                                    "multipart/form-data; boundary=" + upload.boundary())
+                            .POST(HttpRequest.BodyPublishers.ofString(upload.content()));
+            endpoint.headers().forEach(requestBuilder::setHeader);
+
             HttpResponse<String> httpResp =
-                    httpClient.send(
-                            HttpRequest.newBuilder()
-                                    .uri(endpoint.uri())
-                                    .headers(headers)
-                                    .setHeader(
-                                            HttpHeaders.CONTENT_TYPE,
-                                            "multipart/form-data; boundary=" + upload.boundary())
-                                    .POST(HttpRequest.BodyPublishers.ofString(upload.content()))
-                                    .build(),
-                            HttpResponse.BodyHandlers.ofString());
+                    httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
 
             if (httpResp.statusCode() < 200 || 300 <= httpResp.statusCode()) {
                 return Result.error(HttpError.of(httpResp));
