@@ -6,6 +6,7 @@ import io.allezgo.client.HttpError;
 import io.allezgo.client.ObjectHttpClient;
 import io.allezgo.client.Result;
 import io.allezgo.config.Configuration;
+
 import java.net.URI;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -37,7 +38,9 @@ public final class PelotonClient {
     public Result<PelotonActivities, HttpError> activities(int page, int limit) {
         return client.get(
                 base.path("api", "user", session.get().userId(), "workouts")
-                        .query(Map.of("joins", "ride", "limit", limit, "page", page)),
+                        .query("joins", "ride")
+                        .query("limit", limit)
+                        .query("page", page),
                 PelotonActivities.class,
                 "cookie",
                 session.get().toCookies());
@@ -46,7 +49,7 @@ public final class PelotonClient {
     public Result<Ride, HttpError> ride(RidePointer ride) {
         return client.get(
                 base.path("api", "ride", ride.id().value(), "details")
-                        .query(Map.of("stream_source", "multichannel")),
+                        .query("stream_source", "multichannel"),
                 Ride.class,
                 "cookie",
                 session.get().toCookies());
@@ -55,7 +58,7 @@ public final class PelotonClient {
     public Result<PerformanceSummary, HttpError> metrics(ActivityId activityId) {
         return client.get(
                 base.path("api", "workout", activityId.value(), "performance_graph")
-                        .query(Map.of("every_n", 1)),
+                        .query("every_n", 1),
                 PerformanceSummary.class,
                 "cookie",
                 session.get().toCookies());
