@@ -53,6 +53,41 @@ public final class GarminClient {
         return pelotonGear;
     }
 
+    /**
+     * Performs a Garmin login.
+     *
+     * <p>Garmin logins consist of the following sequence:</p>
+     * <ol>
+     *     <li>POST username and password to sso.garmin.com as if submitted by an embedded
+     *     login form. Note that we need to use the embedded form as otherwise the submission
+     *     requires a CSRF token that needs to be read by loading the login HTML and extracting
+     *     from the rendered login form. We avoid all the normal browser protections for CSRF
+     *     anyway since this is Java and not a browser.
+     *
+     *     <p>Also note that the login URI includes a query parameter {@code consumeServiceTicket=false}
+     *     that seems to discard the need for us to do anything besides the next steps of
+     *     following redirects (without the parameter the redirects no longer guide the initialization
+     *     process).</p></li>
+     *     <li>Initialize the token and identify our load balancer by navigating to
+     *     connect.garmin.com/modern with all the cookies we obtained from the first step.</li>
+     *     <li>Follow some number of redirects that, in turn, seem to activate our token and
+     *     prime one of the load balancers to accept that token.</li>
+     *     <li>Extract the three cookies we need to have a live session with the Garmin API
+     *         <ul>
+     *             <li>{@code __cflb}: the load balancer that will accept the session</li>
+     *             <li>{@code SESSIONID}: the actual session</li>
+     *             <li>{@code GARMIN-SSO-GUID}: what appears to be a user-identifying token that goes
+     *             with {@code SESSIONID}</li>
+     *         </ul>
+     *     </li>
+     * </ol>
+     *
+     * <p>The original implementation of this method tried to explicitly manage the cookies passed
+     * from domain to domain, but ultimately degraded to passing all the cookies seen up to the next
+     * page load, so this method dedicates a client and a cookie handler for each invocation and
+     * simply grabs the final three cookies to load a session object rather than something more
+     * precise.</p>
+     */
     public Result<GarminSession, HttpError> login(String email, String password) {
         CookieManager cookieHandler =
                 new CookieManager(/* InMemoryCookieStore */ null, CookiePolicy.ACCEPT_ALL);
@@ -82,7 +117,7 @@ public final class GarminClient {
                             HttpResponse.BodyHandlers.ofString());
 
             if (loginResp.statusCode() != 200) {
-                return Result.error(HttpError.of(loginResp, "Error while loggingi n"));
+                return Result.error(HttpError.of(loginResp, "Error while logging in"));
             }
 
             int count = 0;
