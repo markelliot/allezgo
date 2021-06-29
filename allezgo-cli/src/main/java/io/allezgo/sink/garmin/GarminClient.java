@@ -10,9 +10,6 @@ import io.allezgo.client.ObjectHttpClient;
 import io.allezgo.client.Result;
 import io.allezgo.config.Configuration;
 import io.allezgo.sink.tcx.Tcx;
-import io.allezgo.source.peloton.PelotonActivities;
-import io.allezgo.source.peloton.PelotonActivity;
-
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -255,32 +252,38 @@ public final class GarminClient {
     }
 
     public Stream<GarminActivity> activitiesAsStream() {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<>() {
-            private List<GarminActivity> activities =
-                    activities(0, 20).orElseThrow(HttpError::toException);
-            private Iterator<GarminActivity> currentPageIter = activities.iterator();
-            private int start = 0;
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(
+                        new Iterator<>() {
+                            private List<GarminActivity> activities =
+                                    activities(0, 20).orElseThrow(HttpError::toException);
+                            private Iterator<GarminActivity> currentPageIter =
+                                    activities.iterator();
+                            private int start = 0;
 
-            @Override
-            public boolean hasNext() {
-                if (currentPageIter.hasNext()) {
-                    return true;
-                }
-                // TODO(markelliot): not great that we have to do this in hasNext()
-                start += 20;
-                activities = activities(start, 20).orElseThrow(HttpError::toException);
-                currentPageIter = activities.iterator();
-                return currentPageIter.hasNext();
-            }
+                            @Override
+                            public boolean hasNext() {
+                                if (currentPageIter.hasNext()) {
+                                    return true;
+                                }
+                                // TODO(markelliot): not great that we have to do this in hasNext()
+                                start += 20;
+                                activities =
+                                        activities(start, 20).orElseThrow(HttpError::toException);
+                                currentPageIter = activities.iterator();
+                                return currentPageIter.hasNext();
+                            }
 
-            @Override
-            public GarminActivity next() {
-                if (!hasNext()) {
-                    throw new IllegalStateException("No more entries.");
-                }
-                return currentPageIter.next();
-            }
-        }, Spliterator.IMMUTABLE), false);
+                            @Override
+                            public GarminActivity next() {
+                                if (!hasNext()) {
+                                    throw new IllegalStateException("No more entries.");
+                                }
+                                return currentPageIter.next();
+                            }
+                        },
+                        Spliterator.IMMUTABLE),
+                false);
     }
 
     public Result<List<GarminGear>, HttpError> gear(GarminActivityId activityId) {

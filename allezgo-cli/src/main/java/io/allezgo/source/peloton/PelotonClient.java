@@ -6,14 +6,9 @@ import io.allezgo.client.HttpError;
 import io.allezgo.client.ObjectHttpClient;
 import io.allezgo.client.Result;
 import io.allezgo.config.Configuration;
-
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -54,28 +49,34 @@ public final class PelotonClient {
     }
 
     public Stream<PelotonActivity> activitiesAsStream() {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<>() {
-            private PelotonActivities activities =
-                    activities(0, 100).orElseThrow(HttpError::toException);
-            private Iterator<PelotonActivity> currentPageIter = activities.data().iterator();
-            private int page = 0;
+        return StreamSupport.stream(
+                Spliterators.spliteratorUnknownSize(
+                        new Iterator<>() {
+                            private PelotonActivities activities =
+                                    activities(0, 100).orElseThrow(HttpError::toException);
+                            private Iterator<PelotonActivity> currentPageIter =
+                                    activities.data().iterator();
+                            private int page = 0;
 
-            @Override
-            public boolean hasNext() {
-                return currentPageIter.hasNext() || page < activities.pageCount();
-            }
+                            @Override
+                            public boolean hasNext() {
+                                return currentPageIter.hasNext() || page < activities.pageCount();
+                            }
 
-            @Override
-            public PelotonActivity next() {
-                if (currentPageIter.hasNext()) {
-                    return currentPageIter.next();
-                }
-                page++;
-                activities = activities(page, 100).orElseThrow(HttpError::toException);
-                currentPageIter = activities.data().iterator();
-                return currentPageIter.next();
-            }
-        }, Spliterator.IMMUTABLE), false);
+                            @Override
+                            public PelotonActivity next() {
+                                if (currentPageIter.hasNext()) {
+                                    return currentPageIter.next();
+                                }
+                                page++;
+                                activities =
+                                        activities(page, 100).orElseThrow(HttpError::toException);
+                                currentPageIter = activities.data().iterator();
+                                return currentPageIter.next();
+                            }
+                        },
+                        Spliterator.IMMUTABLE),
+                false);
     }
 
     public Result<Ride, HttpError> ride(RidePointer ride) {

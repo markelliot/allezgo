@@ -14,9 +14,11 @@ import io.allezgo.source.peloton.Ride;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public final class Main {
     private Main() {}
@@ -27,9 +29,7 @@ public final class Main {
             consoleln(
                     """
                     Valid commands:
-                      last     safely synchronizes the latest ride from Peloton to Garmin.
-                               This command is safe in the sense that this operation will only sync the
-                               ride if it has not already been synchronized.
+                      latest   synchronizes up to the last 30 days of Peloton rides to Garmin Connect.
                     """);
             return;
         }
@@ -49,8 +49,8 @@ public final class Main {
         GarminClient garmin = new GarminClient(config.garmin());
 
         switch (command) {
-            case "last":
-                last(peloton, garmin);
+            case "latest":
+                latest(peloton, garmin);
                 return;
             default:
                 consoleln("Unknown command '" + command + "'");
@@ -58,40 +58,59 @@ public final class Main {
         }
     }
 
-    private static void last(PelotonClient peloton, GarminClient garmin) {
-        PelotonActivity lastPelotonRide =
+    private static void latest(PelotonClient peloton, GarminClient garmin) {
+        List<GarminActivity> garminActivitiesLastMonth =
+                garmin.activitiesAsStream()
+                        .takeWhile(ga -> ga.tcxId().isAfter(Instant.now().minus(Period.ofDays(30))))
+                        .toList();
+
+        List<PelotonActivity> pelotonActivitiesLastMonth =
                 peloton.activitiesAsStream()
+                        .takeWhile(pa -> pa.tcxId().isAfter(Instant.now().minus(Period.ofDays(30))))
                         .filter(
                                 pa ->
                                         pa.fitnessDiscipline()
                                                 .equals(PelotonActivity.FITNESS_DISCIPLINE_CYCLING))
-                        .findFirst()
-                        .orElseThrow(
-                                () ->
-                                        new IllegalStateException(
-                                                "Unable to find a ride in the last 20 Peloton activities"));
+                        .toList();
 
-        consoleln("Found most recent Peloton activity:");
-        consoleln(lastPelotonRide.ride().get().title(), 2);
-        consoleln(lastPelotonRide.ride().get().description(), 2);
-        consoleln("https://members.onepeloton.com/profile/workouts/" + lastPelotonRide.id(), 2);
+        for (PelotonActivity pelotonActivity : pelotonActivitiesLastMonth) {
+            findOrSync(peloton, garmin, pelotonActivity, garminActivitiesLastMonth.stream());
+            consoleln("");
+        }
+    }
+
+    private static void findOrSync(
+            PelotonClient peloton,
+            GarminClient garmin,
+            PelotonActivity pelotonRide,
+            Stream<GarminActivity> garminActivities) {
+        consoleln("Peloton Activity:");
+        consoleln(getActivityDate(pelotonRide) + " " + pelotonRide.ride().get().title(), 2);
+        consoleln(pelotonRide.ride().get().description(), 2);
+        consoleln("https://members.onepeloton.com/profile/workouts/" + pelotonRide.id(), 2);
 
         Optional<GarminActivity> matchedGarminActivity =
-                findMatchingGarminActivity(garmin, lastPelotonRide.tcxId());
-
+                findMatchingGarminActivity(garminActivities, pelotonRide.tcxId());
         matchedGarminActivity.ifPresentOrElse(
                 ga -> {
-                    consoleln("Found matching Garmin activity:");
+                    consoleln("Matching Garmin activity:");
                     consoleln(ga.activityName(), 2);
                     consoleln(ga.description().orElse(""), 2);
                     consoleln("https://connect.garmin.com/modern/activity/" + ga.activityId(), 2);
 
                     // TODO(markelliot): maybe clean up title/description if different than target
                 },
-                () -> uploadRideToGarmin(peloton, garmin, lastPelotonRide));
+                () -> {
+                    GarminActivityId garminId = uploadRideToGarmin(peloton, garmin, pelotonRide);
+
+                    consoleln("Created a new Garmin activity:");
+                    consoleln(pelotonRide.ride().get().title(), 2);
+                    consoleln(pelotonRide.ride().get().description(), 2);
+                    consoleln("https://connect.garmin.com/modern/activity/" + garminId, 2);
+                });
     }
 
-    private static void uploadRideToGarmin(
+    private static GarminActivityId uploadRideToGarmin(
             PelotonClient peloton, GarminClient garmin, PelotonActivity lastPelotonRide) {
         Ride rideDetails =
                 peloton.ride(lastPelotonRide.ride().get()).orElseThrow(HttpError::toException);
@@ -99,19 +118,18 @@ public final class Main {
                 peloton.metrics(lastPelotonRide.id()).orElseThrow(HttpError::toException);
         Tcx tcx = PelotonToTcx.convertToTcx(lastPelotonRide, rideDetails, metrics);
 
-        GarminActivityId garminId = garmin.uploadTcx(tcx).orElseThrow(HttpError::toException);
+        GarminActivityId garminActivityId =
+                garmin.uploadTcx(tcx).orElseThrow(HttpError::toException);
 
-        String title =
-                rideDetails.ride().title() + " with " + rideDetails.ride().instructor().name();
+        String title = rideDetails.ride().titleWithInstructor();
         String description = rideDetails.ride().description();
-        garmin.updateActivity(garminId, title, description).orElseThrow(HttpError::toException);
+        garmin.updateActivity(garminActivityId, title, description)
+                .orElseThrow(HttpError::toException);
 
-        garmin.setNamedGear(garminId, getActivityDate(lastPelotonRide), garmin.pelotonGear());
+        garmin.setNamedGear(
+                garminActivityId, getActivityDate(lastPelotonRide), garmin.pelotonGear());
 
-        consoleln("Created a new Garmin activity:");
-        consoleln(title, 2);
-        consoleln(description, 2);
-        consoleln("https://connect.garmin.com/modern/activity/" + garminId, 2);
+        return garminActivityId;
     }
 
     private static LocalDate getActivityDate(PelotonActivity lastPelotonRide) {
@@ -123,22 +141,23 @@ public final class Main {
      * Iterates through Garmin activities until either:
      *
      * <ol>
-     *   <li>we find this ride (or one within +/- 2 minutes of its start)
+     *   <li>we find this ride (exact start time or one within +/- 2 minutes of its start)
      *   <li>we see at least one ride older than this one
      * </ol>
      */
-    public static Optional<GarminActivity> findMatchingGarminActivity(
-            GarminClient garmin, Instant activityStart) {
-        return garmin.activitiesAsStream()
+    private static Optional<GarminActivity> findMatchingGarminActivity(
+            Stream<GarminActivity> garminActivities, Instant activityStart) {
+        return garminActivities
                 .takeWhile(ga -> ga.tcxId().isAfter(activityStart.minusSeconds(120L)))
-                .filter(ga -> {
-                    Instant gId = ga.tcxId();
-                    if (gId.isAfter(activityStart.minusSeconds(120L))
-                            && gId.isBefore(activityStart.plusSeconds(120L))) {
-                        return true;
-                    }
-                    return false;
-                })
+                .filter(
+                        ga -> {
+                            Instant gId = ga.tcxId();
+                            if (gId.isAfter(activityStart.minusSeconds(120L))
+                                    && gId.isBefore(activityStart.plusSeconds(120L))) {
+                                return true;
+                            }
+                            return false;
+                        })
                 .findFirst();
     }
 

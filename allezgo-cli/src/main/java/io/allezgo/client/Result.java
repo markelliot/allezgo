@@ -7,9 +7,9 @@ import java.util.function.Function;
 /**
  * A Rust-inspired result-xor-error container.
  *
- * <p>Note that one of {@code result} and {@code error} must be non-null. Callers should prefer
- * to use one of the static constructors {@link #ok(Object)} or {@link #error(Object)} rather
- * than directly initializing this record.</p>
+ * <p>Note that one of {@code result} and {@code error} must be non-null. Callers should prefer to
+ * use one of the static constructors {@link #ok(Object)} or {@link #error(Object)} rather than
+ * directly initializing this record.
  */
 public record Result<T, E>(T result, E error) {
     public static <T, E> Result<T, E> ok(T result) {

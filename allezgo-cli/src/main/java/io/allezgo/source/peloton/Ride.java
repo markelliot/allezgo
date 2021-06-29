@@ -27,7 +27,12 @@ public record Ride(RideDescription ride, Averages averages, Segments segments) {
             @JsonProperty("pedaling_end_offset") Seconds pedalingEndOffset,
             @JsonProperty("pedaling_duration") Seconds pedalingDuration,
             List<String> metrics,
-            Instructor instructor) {}
+            Instructor instructor) {
+
+        public String titleWithInstructor() {
+            return title + " with " + instructor.name();
+        }
+    }
 
     public record Instructor(String name) {}
 

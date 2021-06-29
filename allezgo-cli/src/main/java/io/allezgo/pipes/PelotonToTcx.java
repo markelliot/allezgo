@@ -50,6 +50,13 @@ public final class PelotonToTcx {
                             startTick + (int) segment.length().value() - 1,
                             metrics.ticks().size() - 1);
 
+            if (startTick >= metrics.ticks().size()) {
+                // this means the metrics data ends early
+                // TODO(markelliot): we wouldn't need to check this if we didn't assume ticks were
+                // seconds
+                break;
+            }
+
             if (startTick == 0) {
                 // fudge a 0th point because Peloton counts from a tick value of 1s but Garmin
                 // won't count moving time until it sees at least the first tick
