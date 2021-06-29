@@ -27,15 +27,19 @@ public record Result<T, E>(T result, E error) {
     }
 
     public <U> Result<U, E> mapResult(Function<T, U> fn) {
-        return result != null ? Result.ok(fn.apply(result)) : Result.error(error);
+        return !isError() ? Result.ok(fn.apply(result)) : Result.error(error);
     }
 
     public <F> Result<T, F> mapError(Function<E, F> fn) {
-        return error != null ? Result.error(fn.apply(error)) : Result.ok(result);
+        return isError() ? Result.error(fn.apply(error)) : Result.ok(result);
     }
 
     public <U, F> Result<U, F> map(Function<T, U> resultFn, Function<E, F> errorFn) {
         return mapResult(resultFn).mapError(errorFn);
+    }
+
+    public boolean isError() {
+        return error != null;
     }
 
     /** Returns an Optional containing the result if it's present or empty otherwise. */
@@ -49,7 +53,7 @@ public record Result<T, E>(T result, E error) {
     }
 
     public <X extends Exception> T orElseThrow(Function<E, X> exceptionSupplier) throws X {
-        if (error != null) {
+        if (isError()) {
             throw exceptionSupplier.apply(error);
         }
         return result;
@@ -61,7 +65,7 @@ public record Result<T, E>(T result, E error) {
      * #orElseThrow(Function)}.
      */
     public T orElseThrow() throws Exception {
-        if (error != null) {
+        if (isError()) {
             throw new Exception(String.valueOf(error));
         }
         return result;

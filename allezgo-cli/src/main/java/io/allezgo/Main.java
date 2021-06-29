@@ -27,7 +27,7 @@ public final class Main {
             consoleln(
                     """
                     Valid commands:
-                      latest   safely synchronizes the latest ride from Peloton to Garmin.
+                      last     safely synchronizes the latest ride from Peloton to Garmin.
                                This command is safe in the sense that this operation will only sync the
                                ride if it has not already been synchronized.
                     """);
@@ -49,8 +49,8 @@ public final class Main {
         GarminClient garmin = new GarminClient(config.garmin());
 
         switch (command) {
-            case "latest":
-                latest(peloton, garmin);
+            case "last":
+                last(peloton, garmin);
                 return;
             default:
                 consoleln("Unknown command '" + command + "'");
@@ -58,9 +58,9 @@ public final class Main {
         }
     }
 
-    private static void latest(PelotonClient peloton, GarminClient garmin) {
+    private static void last(PelotonClient peloton, GarminClient garmin) {
         PelotonActivity lastPelotonRide =
-                peloton.activities(0, 20).orElseThrow(HttpError::toException).data().stream()
+                peloton.activitiesAsStream()
                         .filter(
                                 pa ->
                                         pa.fitnessDiscipline()
@@ -71,7 +71,7 @@ public final class Main {
                                         new IllegalStateException(
                                                 "Unable to find a ride in the last 20 Peloton activities"));
 
-        consoleln("Found latest Peloton activity:");
+        consoleln("Found most recent Peloton activity:");
         consoleln(lastPelotonRide.ride().get().title(), 2);
         consoleln(lastPelotonRide.ride().get().description(), 2);
         consoleln("https://members.onepeloton.com/profile/workouts/" + lastPelotonRide.id(), 2);
