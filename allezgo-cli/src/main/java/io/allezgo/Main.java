@@ -129,28 +129,17 @@ public final class Main {
      */
     public static Optional<GarminActivity> findMatchingGarminActivity(
             GarminClient garmin, Instant activityStart) {
-        int start = 0;
-        while (true) {
-            List<GarminActivity> activities =
-                    garmin.activities(start, 10).orElseThrow(HttpError::toException);
-            if (activities.isEmpty()) {
-                // reached end of activities
-                return Optional.empty();
-            }
-            for (GarminActivity ga : activities) {
-                Instant gId = ga.tcxId();
-                if (gId.isAfter(activityStart.minusSeconds(120L))
-                        && gId.isBefore(activityStart.plusSeconds(120L))) {
-                    return Optional.of(ga);
-                }
-
-                // reached an older activity, no need to continue looking
-                if (gId.isBefore(activityStart)) {
-                    return Optional.empty();
-                }
-            }
-            start += 10;
-        }
+        return garmin.activitiesAsStream()
+                .takeWhile(ga -> ga.tcxId().isAfter(activityStart.minusSeconds(120L)))
+                .filter(ga -> {
+                    Instant gId = ga.tcxId();
+                    if (gId.isAfter(activityStart.minusSeconds(120L))
+                            && gId.isBefore(activityStart.plusSeconds(120L))) {
+                        return true;
+                    }
+                    return false;
+                })
+                .findFirst();
     }
 
     private static void consoleln(String line) {

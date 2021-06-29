@@ -10,6 +10,9 @@ import io.allezgo.client.ObjectHttpClient;
 import io.allezgo.client.Result;
 import io.allezgo.config.Configuration;
 import io.allezgo.sink.tcx.Tcx;
+import io.allezgo.source.peloton.PelotonActivities;
+import io.allezgo.source.peloton.PelotonActivity;
+
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -19,10 +22,15 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public final class GarminClient {
     private static final ObjectHttpClient client = new ObjectHttpClient();
@@ -244,6 +252,35 @@ public final class GarminClient {
                                 .build(),
                         GarminActivitiesResponse.class)
                 .mapResult(GarminActivitiesResponse::activities);
+    }
+
+    public Stream<GarminActivity> activitiesAsStream() {
+        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(new Iterator<>() {
+            private List<GarminActivity> activities =
+                    activities(0, 20).orElseThrow(HttpError::toException);
+            private Iterator<GarminActivity> currentPageIter = activities.iterator();
+            private int start = 0;
+
+            @Override
+            public boolean hasNext() {
+                if (currentPageIter.hasNext()) {
+                    return true;
+                }
+                // TODO(markelliot): not great that we have to do this in hasNext()
+                start += 20;
+                activities = activities(start, 20).orElseThrow(HttpError::toException);
+                currentPageIter = activities.iterator();
+                return currentPageIter.hasNext();
+            }
+
+            @Override
+            public GarminActivity next() {
+                if (!hasNext()) {
+                    throw new IllegalStateException("No more entries.");
+                }
+                return currentPageIter.next();
+            }
+        }, Spliterator.IMMUTABLE), false);
     }
 
     public Result<List<GarminGear>, HttpError> gear(GarminActivityId activityId) {
