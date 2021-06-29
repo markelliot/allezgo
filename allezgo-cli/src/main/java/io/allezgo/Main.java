@@ -152,11 +152,8 @@ public final class Main {
                 .filter(
                         ga -> {
                             Instant gId = ga.tcxId();
-                            if (gId.isAfter(activityStart.minusSeconds(120L))
-                                    && gId.isBefore(activityStart.plusSeconds(120L))) {
-                                return true;
-                            }
-                            return false;
+                            return gId.isAfter(activityStart.minusSeconds(120L))
+                                    && gId.isBefore(activityStart.plusSeconds(120L));
                         })
                 .findFirst();
     }
