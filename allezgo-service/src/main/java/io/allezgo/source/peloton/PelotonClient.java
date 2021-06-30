@@ -1,5 +1,6 @@
 package io.allezgo.source.peloton;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Suppliers;
 import io.allezgo.client.Endpoint;
 import io.allezgo.client.HttpError;
@@ -39,10 +40,9 @@ public final class PelotonClient {
 
     public boolean validateLogin() {
         // TODO(markelliot): we need to clean up the way the client works, the
-        // exceptions-for-control-flow
-        //   is evidence of bad composition
+        // exceptions-for-control-flow is evidence of bad composition
         try {
-            this.session.get();
+            Preconditions.checkNotNull(this.session.get());
             return true;
         } catch (Exception e) {
             return false;

@@ -1,7 +1,7 @@
 rootProject.name = "allezgo"
 
 include("barista")
-include("allezgo-cli")
+include("allezgo-service")
 
 pluginManagement {
     repositories {

@@ -1,5 +1,6 @@
 package io.allezgo.sink.garmin;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Suppliers;
 import com.google.common.net.HttpHeaders;
 import com.google.common.net.MediaType;
@@ -56,10 +57,9 @@ public final class GarminClient {
 
     public boolean validateLogin() {
         // TODO(markelliot): we need to clean up the way the client works, the
-        // exceptions-for-control-flow
-        //   is evidence of bad composition
+        // exceptions-for-control-flow is evidence of bad composition
         try {
-            this.session.get();
+            Preconditions.checkNotNull(this.session.get());
             return true;
         } catch (Exception e) {
             return false;

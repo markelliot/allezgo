@@ -3,19 +3,19 @@ package barista;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
 
+@SuppressWarnings("ImmutableEnumChecker")
 public enum HttpMethod {
     GET(Methods.GET),
     PUT(Methods.PUT),
-    POST(Methods.POST),
-    DELETE(Methods.DELETE);
+    POST(Methods.POST);
 
     private final HttpString method;
 
-    private HttpMethod(HttpString method) {
+    HttpMethod(HttpString method) {
         this.method = method;
     }
 
-    HttpString method() {
+    public HttpString method() {
         return method;
     }
 }

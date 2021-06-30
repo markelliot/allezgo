@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class SyncPelotonToGarmin
+public final class SyncPelotonToGarmin
         implements Endpoints.Open<SyncPelotonToGarmin.Request, SyncPelotonToGarmin.Response> {
 
     public SyncPelotonToGarmin() {}

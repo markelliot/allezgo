@@ -43,6 +43,14 @@ allprojects {
             to {
                 image = imageName
             }
+            extraDirectories {
+                paths {
+                    path {
+                        setFrom(file("${rootDir}/var"))
+                        setInto("/var")
+                    }
+                }
+            }
         }
     }
 

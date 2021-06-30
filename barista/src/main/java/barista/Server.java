@@ -25,7 +25,7 @@ public final class Server {
         return new Builder();
     }
 
-    public static class Builder {
+    public static final class Builder {
         private int port = 8443;
         private Set<Endpoints.Open<?, ?>> openEndpoints = new LinkedHashSet<>();
         private Set<Endpoints.VerifiedAuth<?, ?>> authEndpoints = new LinkedHashSet<>();
