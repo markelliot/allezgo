@@ -1,5 +1,6 @@
 rootProject.name = "allezgo"
 
+include("barista")
 include("allezgo-cli")
 
 pluginManagement {

@@ -37,6 +37,18 @@ public final class PelotonClient {
         return response.mapResult(r -> new PelotonSession(r.sessionId(), r.userId()));
     }
 
+    public boolean validateLogin() {
+        // TODO(markelliot): we need to clean up the way the client works, the
+        // exceptions-for-control-flow
+        //   is evidence of bad composition
+        try {
+            this.session.get();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public Result<PelotonActivities, HttpError> activities(int page, int limit) {
         return client.get(
                 base.path("api", "user", session.get().userId(), "workouts")

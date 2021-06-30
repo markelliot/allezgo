@@ -54,6 +54,18 @@ public final class GarminClient {
         this.pelotonGear = conf.pelotonGear();
     }
 
+    public boolean validateLogin() {
+        // TODO(markelliot): we need to clean up the way the client works, the
+        // exceptions-for-control-flow
+        //   is evidence of bad composition
+        try {
+            this.session.get();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public String pelotonGear() {
         return pelotonGear;
     }

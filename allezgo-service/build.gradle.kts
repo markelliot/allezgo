@@ -1,8 +1,10 @@
 plugins {
     `java-library`
+    `application`
 }
 
 dependencies {
+    implementation(project(":barista"))
     implementation("com.fasterxml.jackson.core:jackson-databind")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-guava")

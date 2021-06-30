@@ -1,5 +1,6 @@
 package io.allezgo.client;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import java.util.Optional;
 import java.util.function.Function;
@@ -11,7 +12,7 @@ import java.util.function.Function;
  * use one of the static constructors {@link #ok(Object)} or {@link #error(Object)} rather than
  * directly initializing this record.
  */
-public record Result<T, E>(T result, E error) {
+public record Result<T, E>(@JsonProperty("result") T result, @JsonProperty("error") E error) {
     public static <T, E> Result<T, E> ok(T result) {
         return new Result<>(result, null);
     }

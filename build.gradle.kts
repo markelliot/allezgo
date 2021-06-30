@@ -4,7 +4,7 @@ import net.ltgt.gradle.errorprone.errorprone
 plugins {
     idea
     id("com.diffplug.spotless") version "5.12.5"
-    id("com.google.cloud.tools.jib") version "1.0.2" apply false
+    id("com.google.cloud.tools.jib") version "3.1.1" apply false
     id("com.palantir.consistent-versions") version "1.28.0"
     id("net.ltgt.errorprone") version "2.0.1" apply false
     id("org.inferred.processors") version "3.3.0" apply false
@@ -29,33 +29,21 @@ allprojects {
     plugins.withType<ApplicationPlugin> {
         apply(plugin = "com.google.cloud.tools.jib")
 
-        val projectId = System.getenv("GOOGLE_PROJECT_ID")
-        val imageName = "gcr.io/$projectId/${project.name}:${project.version}"
+        // val projectId = System.getenv("GOOGLE_PROJECT_ID")
+        // val imageName = "gcr.io/$projectId/${project.name}:${project.version}"
+        val imageName = "${project.name}:${project.version}"
 
         // https://circleci.com/docs/2.0/google-auth/
         // https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin#using-specific-credentials
         configure<JibExtension> {
+            from {
+                image = "azul/zulu-openjdk:16"
+                credHelper = "osxkeychain"
+            }
             to {
                 image = imageName
-                auth {
-                    username = "_json_key"
-                    password = System.getenv("GCLOUD_SERVICE_KEY")
-                }
             }
         }
-
-        tasks.register("publish").get().dependsOn("jib")
-        tasks.register("publishLocal").get().dependsOn("jibBuildTar")
-
-        task("deploy") {
-            doLast {
-                "kubectl set image deployment/${project.name} ${project.name}=$imageName".runCommand()
-            }
-        }.dependsOn("publish")
-
-        // Only enable publishing on CI
-        // https://circleci.com/docs/2.0/env-vars/#built-in-environment-variables
-        tasks["publish"].enabled = booleanEnv("CIRCLECI") ?: false
     }
 
     plugins.withType<JavaLibraryPlugin> {
