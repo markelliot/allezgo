@@ -17,7 +17,7 @@ public final class Server {
         Runtime.getRuntime().addShutdownHook(new Thread(undertow::stop));
     }
 
-    public void join() {
+    private void start() {
         undertow.start();
     }
 
@@ -31,6 +31,7 @@ public final class Server {
         private Set<Endpoints.VerifiedAuth<?, ?>> authEndpoints = new LinkedHashSet<>();
         private SerDe serde = new SerDe.ObjectMapperSerDe();
         private Authz authz = null;
+        private boolean tls = true;
 
         private Builder() {}
 
@@ -60,7 +61,12 @@ public final class Server {
             return this;
         }
 
-        public Server build() {
+        public Builder disableTls() {
+            this.tls = false;
+            return this;
+        }
+
+        public Server start() {
             Preconditions.checkNotNull(authz);
 
             Handlers handlers = new Handlers(serde, authz);
@@ -76,15 +82,18 @@ public final class Server {
                                     .getResponseSender()
                                     .send("Unknown API Endpoint"));
 
-            return new Server(
-                    Undertow.builder()
-                            .addHttpsListener(
-                                    port,
-                                    "0.0.0.0",
-                                    TransportLayerSecurity.createSslContext(
-                                            Paths.get("var", "security")))
-                            .setHandler(router)
-                            .build());
+            Undertow.Builder builder = Undertow.builder().setHandler(router);
+            if (tls) {
+                builder.addHttpsListener(
+                        port,
+                        "0.0.0.0",
+                        TransportLayerSecurity.createSslContext(Paths.get("var", "security")));
+            } else {
+                builder.addHttpListener(port, "0.0.0.0");
+            }
+            Server server = new Server(builder.build());
+            server.start();
+            return server;
         }
     }
 }

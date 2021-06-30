@@ -15,6 +15,10 @@ public final class Main {
         }
 
         Authz authz = new Authz("secret", Clock.systemUTC());
-        Server.builder().authz(authz).endpoint(new SyncPelotonToGarmin()).build().join();
+        Server.builder()
+                .disableTls() // our host provides this for us
+                .authz(authz)
+                .endpoint(new SyncPelotonToGarmin())
+                .start();
     }
 }

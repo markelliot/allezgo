@@ -46,7 +46,7 @@ allprojects {
             extraDirectories {
                 paths {
                     path {
-                        setFrom(file("${rootDir}/var"))
+                        setFrom(file("$rootDir/var"))
                         setInto("/var")
                     }
                 }
