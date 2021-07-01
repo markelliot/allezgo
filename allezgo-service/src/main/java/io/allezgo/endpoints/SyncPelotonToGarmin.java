@@ -2,6 +2,7 @@ package io.allezgo.endpoints;
 
 import barista.Endpoints;
 import barista.HttpMethod;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Strings;
 import io.allezgo.client.HttpError;
 import io.allezgo.client.Result;
@@ -113,7 +114,7 @@ public final class SyncPelotonToGarmin
             String garminLink,
             boolean wasCreated) {}
 
-    public record Response(Result<List<SyncRecord>, String> result) {}
+    public record Response(@JsonValue Result<List<SyncRecord>, String> response) {}
 
     private static List<SyncRecord> syncLast30Days(PelotonClient peloton, GarminClient garmin) {
         Instant thirtyDaysAgo = Instant.now().minus(Period.ofDays(30));
