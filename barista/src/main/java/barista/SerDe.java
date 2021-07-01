@@ -3,15 +3,19 @@ package barista;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.common.net.MediaType;
 import java.io.IOException;
 
 public interface SerDe {
     <T> ByteRepr serialize(T any);
 
     <T> T deserialize(ByteRepr bytes, Class<T> objClass);
+
+    String contentType();
 
     record ByteRepr(String raw) {}
 
@@ -24,7 +28,8 @@ public interface SerDe {
                             .registerModule(new GuavaModule())
                             .registerModule(new Jdk8Module())
                             .registerModule(new JavaTimeModule())
-                            .setSerializationInclusion(JsonInclude.Include.NON_ABSENT);
+                            .setSerializationInclusion(JsonInclude.Include.NON_ABSENT)
+                            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         }
 
         @Override
@@ -43,6 +48,11 @@ public interface SerDe {
             } catch (IOException e) {
                 throw new RuntimeException("Error while deserializing object from bytes", e);
             }
+        }
+
+        @Override
+        public String contentType() {
+            return MediaType.JSON_UTF_8.toString();
         }
     }
 }

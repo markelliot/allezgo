@@ -29,6 +29,7 @@ public final class Server {
         private int port = 8443;
         private Set<Endpoints.Open<?, ?>> openEndpoints = new LinkedHashSet<>();
         private Set<Endpoints.VerifiedAuth<?, ?>> authEndpoints = new LinkedHashSet<>();
+        private Set<String> allowedOrigins = new LinkedHashSet<>();
         private SerDe serde = new SerDe.ObjectMapperSerDe();
         private Authz authz = null;
         private boolean tls = true;
@@ -48,6 +49,11 @@ public final class Server {
         public <Request, Response> Builder endpoint(
                 Endpoints.VerifiedAuth<Request, Response> endpoint) {
             authEndpoints.add(endpoint);
+            return this;
+        }
+
+        public Builder allowOrigin(String origin) {
+            allowedOrigins.add(origin);
             return this;
         }
 
@@ -82,7 +88,11 @@ public final class Server {
                                     .getResponseSender()
                                     .send("Unknown API Endpoint"));
 
-            Undertow.Builder builder = Undertow.builder().setHandler(router);
+            Undertow.Builder builder =
+                    Undertow.builder()
+                            .setHandler(
+                                    Handlers.dispatchFromIoThread(
+                                            Handlers.cors(router, allowedOrigins)));
             if (tls) {
                 builder.addHttpsListener(
                         port,

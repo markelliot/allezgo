@@ -19,6 +19,8 @@ public final class Main {
                 .disableTls() // our host provides this for us
                 .authz(authz)
                 .endpoint(new SyncPelotonToGarmin())
+                .allowOrigin("https://allezgo.io")
+                .allowOrigin("http://localhost:8080") // for development
                 .start();
     }
 }
