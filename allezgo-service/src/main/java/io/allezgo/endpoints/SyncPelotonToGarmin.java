@@ -2,10 +2,8 @@ package io.allezgo.endpoints;
 
 import barista.Endpoints;
 import barista.HttpMethod;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.Strings;
 import io.allezgo.client.HttpError;
-import io.allezgo.client.Result;
 import io.allezgo.config.Configuration;
 import io.allezgo.pipes.PelotonToTcx;
 import io.allezgo.sink.garmin.GarminActivity;
@@ -51,8 +49,7 @@ public final class SyncPelotonToGarmin
     public Response call(Request request) {
         List<String> failingArgs = checkArgs(request);
         if (!failingArgs.isEmpty()) {
-            return new Response(
-                    Result.error("Some required fields were missing or empty: " + failingArgs));
+            return new Response(null, "Some required fields were missing or empty: " + failingArgs);
         }
 
         PelotonClient peloton =
@@ -60,8 +57,7 @@ public final class SyncPelotonToGarmin
                         new Configuration.Peloton(request.pelotonEmail, request.pelotonPassword));
 
         if (!peloton.validateLogin()) {
-            return new Response(
-                    Result.error("Unable to login to Peloton with the provided credentials"));
+            return new Response(null, "Unable to login to Peloton with the provided credentials");
         }
 
         GarminClient garmin =
@@ -72,11 +68,10 @@ public final class SyncPelotonToGarmin
                                 request.garminPelotonGearName));
 
         if (!garmin.validateLogin()) {
-            return new Response(
-                    Result.error("Unable to login to Garmin with the provided credentials"));
+            return new Response(null, "Unable to login to Garmin with the provided credentials");
         }
 
-        return new Response(Result.ok(syncLast30Days(peloton, garmin)));
+        return new Response(syncLast30Days(peloton, garmin), null);
     }
 
     private static List<String> checkArgs(Request request) {
@@ -114,7 +109,7 @@ public final class SyncPelotonToGarmin
             String garminLink,
             boolean wasCreated) {}
 
-    public record Response(@JsonValue Result<List<SyncRecord>, String> response) {}
+    public record Response(List<SyncRecord> result, String error) {}
 
     private static List<SyncRecord> syncLast30Days(PelotonClient peloton, GarminClient garmin) {
         Instant thirtyDaysAgo = Instant.now().minus(Period.ofDays(30));

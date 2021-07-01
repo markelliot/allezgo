@@ -1,5 +1,7 @@
 package barista;
 
+import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS;
+
 import com.google.common.base.Joiner;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
@@ -7,11 +9,8 @@ import io.undertow.util.HeaderValues;
 import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.Methods;
-
 import java.util.Optional;
 import java.util.Set;
-
-import static com.google.common.net.HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS;
 
 public final class Handlers {
     private static final HttpString ACCESS_CONTROL_ALLOW_ORIGIN =
@@ -154,6 +153,7 @@ public final class Handlers {
         } catch (Exception e) {
             exchange.setStatusCode(500);
             exchange.getResponseSender().send("Server Error");
+            e.printStackTrace();
         }
     }
 
