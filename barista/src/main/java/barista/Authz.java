@@ -11,10 +11,12 @@ import java.util.Optional;
 public final class Authz {
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
-    private Clock clock;
+    private final String issuer;
+    private final Clock clock;
 
-    public Authz(String secret, Clock clock) {
+    public Authz(String secret, String issuer, Clock clock) {
         this.algorithm = Algorithm.HMAC256(secret);
+        this.issuer = issuer;
         this.clock = clock;
         this.verifier = JWT.require(algorithm).build();
     }
@@ -22,7 +24,7 @@ public final class Authz {
     public AuthToken newSession(String userId) {
         return AuthTokens.of(
                 JWT.create()
-                        .withIssuer("shareloyal")
+                        .withIssuer(issuer)
                         .withSubject(userId)
                         .withExpiresAt(Date.from(clock.instant().plus(1, ChronoUnit.DAYS)))
                         .sign(algorithm));

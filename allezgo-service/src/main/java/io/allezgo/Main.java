@@ -14,7 +14,7 @@ public final class Main {
             return;
         }
 
-        Authz authz = new Authz("secret", Clock.systemUTC());
+        Authz authz = new Authz("unused", "unused", Clock.systemUTC());
         Server.builder()
                 .disableTls() // our host provides this for us
                 .authz(authz)
