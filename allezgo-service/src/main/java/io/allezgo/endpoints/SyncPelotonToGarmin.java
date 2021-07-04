@@ -51,6 +51,9 @@ public final class SyncPelotonToGarmin
         if (!failingArgs.isEmpty()) {
             return new Response(null, "Some required fields were missing or empty: " + failingArgs);
         }
+        if (request.numDaysToSync < 0 || request.numDaysToSync > 30) {
+            return new Response(null, "numDaysToSync must be between 1 and 30");
+        }
 
         PelotonClient peloton =
                 new PelotonClient(
@@ -71,7 +74,7 @@ public final class SyncPelotonToGarmin
             return new Response(null, "Unable to login to Garmin with the provided credentials");
         }
 
-        return new Response(syncLast30Days(peloton, garmin), null);
+        return new Response(syncLastNDays(peloton, garmin, request.numDaysToSync), null);
     }
 
     private static List<String> checkArgs(Request request) {
@@ -99,7 +102,8 @@ public final class SyncPelotonToGarmin
             String pelotonPassword,
             String garminEmail,
             String garminPassword,
-            String garminPelotonGearName) {}
+            String garminPelotonGearName,
+            int numDaysToSync) {}
 
     public record SyncRecord(
             LocalDate activityDate,
@@ -111,8 +115,9 @@ public final class SyncPelotonToGarmin
 
     public record Response(List<SyncRecord> result, String error) {}
 
-    private static List<SyncRecord> syncLast30Days(PelotonClient peloton, GarminClient garmin) {
-        Instant thirtyDaysAgo = Instant.now().minus(Period.ofDays(30));
+    private static List<SyncRecord> syncLastNDays(
+            PelotonClient peloton, GarminClient garmin, int numDays) {
+        Instant thirtyDaysAgo = Instant.now().minus(Period.ofDays(numDays));
 
         List<GarminActivity> garminActivitiesLastMonth =
                 garmin.activitiesAsStream()
