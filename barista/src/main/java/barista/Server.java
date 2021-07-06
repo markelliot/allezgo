@@ -1,9 +1,12 @@
 package barista;
 
+import barista.handlers.BaristaHandler;
+import barista.handlers.CorsHandler;
+import barista.handlers.DispatchFromIoThreadHandler;
+import barista.handlers.HandlerChain;
 import barista.tls.TransportLayerSecurity;
 import com.google.common.base.Preconditions;
 import io.undertow.Undertow;
-import io.undertow.server.RoutingHandler;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -75,24 +78,13 @@ public final class Server {
         public Server start() {
             Preconditions.checkNotNull(authz);
 
-            Handlers handlers = new Handlers(serde, authz);
-
-            RoutingHandler router = new RoutingHandler();
-            openEndpoints.forEach(
-                    e -> router.add(e.method().method(), e.template(), handlers.open(e)));
-            authEndpoints.forEach(
-                    e -> router.add(e.method().method(), e.template(), handlers.verifiedAuth(e)));
-            router.setFallbackHandler(
-                    exchange ->
-                            exchange.setStatusCode(404)
-                                    .getResponseSender()
-                                    .send("Unknown API Endpoint"));
-
+            BaristaHandler handler = new BaristaHandler(serde, authz, authEndpoints, openEndpoints);
             Undertow.Builder builder =
                     Undertow.builder()
                             .setHandler(
-                                    Handlers.dispatchFromIoThread(
-                                            Handlers.cors(router, allowedOrigins)));
+                                    HandlerChain.of(DispatchFromIoThreadHandler::new)
+                                            .then(h -> new CorsHandler(allowedOrigins, h))
+                                            .last(handler.build()));
             if (tls) {
                 builder.addHttpsListener(
                         port,
