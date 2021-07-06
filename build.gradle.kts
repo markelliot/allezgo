@@ -10,7 +10,14 @@ plugins {
     id("org.inferred.processors") version "3.3.0" apply false
 }
 
-version = "git describe --tags".runCommand().trim()
+version = "git describe --tags".runCommand().trim() +
+        (if (!"git status -s".runCommand().isEmpty()) ".dirty" else "")
+
+task("printVersion") {
+    doLast {
+        println(rootProject.version)
+    }
+}
 
 allprojects {
     group = "io.github.markelliot.md"
