@@ -1,8 +1,8 @@
 package barista;
 
-import barista.handlers.BaristaHandler;
 import barista.handlers.CorsHandler;
 import barista.handlers.DispatchFromIoThreadHandler;
+import barista.handlers.EndpointHandlerBuilder;
 import barista.handlers.HandlerChain;
 import barista.tls.TransportLayerSecurity;
 import com.google.common.base.Preconditions;
@@ -78,13 +78,13 @@ public final class Server {
         public Server start() {
             Preconditions.checkNotNull(authz);
 
-            BaristaHandler handler = new BaristaHandler(serde, authz, authEndpoints, openEndpoints);
+            EndpointHandlerBuilder handler = new EndpointHandlerBuilder(serde, authz);
             Undertow.Builder builder =
                     Undertow.builder()
                             .setHandler(
                                     HandlerChain.of(DispatchFromIoThreadHandler::new)
                                             .then(h -> new CorsHandler(allowedOrigins, h))
-                                            .last(handler.build()));
+                                            .last(handler.build(authEndpoints, openEndpoints)));
             if (tls) {
                 builder.addHttpsListener(
                         port,

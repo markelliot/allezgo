@@ -15,24 +15,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
-public final class BaristaHandler {
+/** A builder to make an {@link HttpHandler} for specified {@link Endpoints}. */
+public final class EndpointHandlerBuilder {
     private final SerDe serde;
     private final Authz authz;
-    private final Set<Endpoints.VerifiedAuth<?, ?>> authEndpoints;
-    private final Set<Endpoints.Open<?, ?>> openEndpoints;
 
-    public BaristaHandler(
-            SerDe serde,
-            Authz authz,
-            Set<Endpoints.VerifiedAuth<?, ?>> authEndpoints,
-            Set<Endpoints.Open<?, ?>> openEndpoints) {
+    public EndpointHandlerBuilder(SerDe serde, Authz authz) {
         this.serde = serde;
         this.authz = authz;
-        this.authEndpoints = authEndpoints;
-        this.openEndpoints = openEndpoints;
     }
 
-    public HttpHandler build() {
+    public HttpHandler build(
+            Set<Endpoints.VerifiedAuth<?, ?>> authEndpoints,
+            Set<Endpoints.Open<?, ?>> openEndpoints) {
         RoutingHandler router = new RoutingHandler();
         authEndpoints.forEach(e -> router.add(e.method().method(), e.template(), authEndpoint(e)));
         openEndpoints.forEach(e -> router.add(e.method().method(), e.template(), openEndpoint(e)));
