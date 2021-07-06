@@ -29,12 +29,7 @@ allprojects {
     plugins.withType<ApplicationPlugin> {
         apply(plugin = "com.google.cloud.tools.jib")
 
-        // val projectId = System.getenv("GOOGLE_PROJECT_ID")
-        // val imageName = "gcr.io/$projectId/${project.name}:${project.version}"
         val imageName = "${project.name}:${project.version}"
-
-        // https://circleci.com/docs/2.0/google-auth/
-        // https://github.com/GoogleContainerTools/jib/tree/master/jib-gradle-plugin#using-specific-credentials
         configure<JibExtension> {
             from {
                 image = "azul/zulu-openjdk:16"
@@ -42,16 +37,11 @@ allprojects {
             }
             to {
                 image = imageName
-            }
-            extraDirectories {
-                paths {
-                    path {
-                        setFrom(file("$rootDir/var"))
-                        setInto("/var")
-                    }
-                }
+                tags = setOf("latest")
             }
         }
+
+        tasks.register("docker").get().dependsOn("jibDockerBuild")
     }
 
     plugins.withType<JavaLibraryPlugin> {
