@@ -5,5 +5,3 @@ build
 *.iws
 out
 
-var/security/key.pem
-*.toml
