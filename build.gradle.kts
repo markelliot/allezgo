@@ -33,7 +33,6 @@ allprojects {
         configure<JibExtension> {
             from {
                 image = "azul/zulu-openjdk:16"
-                credHelper = "osxkeychain"
             }
             to {
                 image = imageName
