@@ -22,7 +22,7 @@ import java.util.function.Function;
  * </code>
  */
 public final class HandlerChain {
-    private List<Function<HttpHandler, HttpHandler>> handlers = new ArrayList<>();
+    private final List<Function<HttpHandler, HttpHandler>> handlers = new ArrayList<>();
 
     private HandlerChain(Function<HttpHandler, HttpHandler> first) {
         handlers.add(first);

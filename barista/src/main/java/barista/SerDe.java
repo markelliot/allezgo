@@ -20,7 +20,7 @@ public interface SerDe {
     record ByteRepr(String raw) {}
 
     final class ObjectMapperSerDe implements SerDe {
-        private ObjectMapper mapper;
+        private final ObjectMapper mapper;
 
         public ObjectMapperSerDe() {
             this.mapper =
