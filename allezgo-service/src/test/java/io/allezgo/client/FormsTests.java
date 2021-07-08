@@ -24,6 +24,6 @@ final class FormsTests {
     @Test
     public void testBoundaryGeneration() {
         Forms.MultipartUpload up = Forms.MultipartUpload.of("filename.tcx", "content");
-        assertThat(up.boundary()).matches(Pattern.compile("-----[0-9]+"));
+        assertThat(up.boundary()).matches(Pattern.compile("----[0-9]+"));
     }
 }

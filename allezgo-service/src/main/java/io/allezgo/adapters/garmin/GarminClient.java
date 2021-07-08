@@ -133,7 +133,7 @@ public final class GarminClient {
                             HttpResponse.BodyHandlers.ofString());
 
             if (loginResp.statusCode() != 200) {
-                return Result.error(HttpError.of(loginResp, "Error while logging in"));
+                return HttpError.of(loginResp, "Error while logging in");
             }
 
             int count = 0;
@@ -150,8 +150,7 @@ public final class GarminClient {
 
                 count++;
                 if (count > 7) {
-                    return Result.error(
-                            HttpError.of("Failed to initialize token after 7 redirects"));
+                    return HttpError.of("Failed to initialize token after 7 redirects");
                 }
 
                 // follow redirects
@@ -163,15 +162,14 @@ public final class GarminClient {
                 location = URI.create(newLoc.get());
             }
         } catch (IOException | InterruptedException e) {
-            return Result.error(HttpError.of(e.getMessage()));
+            return HttpError.of("Error while logging in", e);
         }
 
         Optional<String> sessionId = findCookie(cookieHandler, "SESSIONID");
         Optional<String> garminSsoGuid = findCookie(cookieHandler, "GARMIN-SSO-GUID");
         Optional<String> cflb = findCookieOnDomain(cookieHandler, "__cflb", "connect.garmin.com");
         if (sessionId.isEmpty() || garminSsoGuid.isEmpty() || cflb.isEmpty()) {
-            return Result.error(
-                    HttpError.of("Missing required cookies from login process, login failed"));
+            return HttpError.of("Missing required cookies from login process, login failed");
         }
         return Result.ok(new GarminSession(sessionId.get(), garminSsoGuid.get(), cflb.get()));
     }
@@ -200,8 +198,7 @@ public final class GarminClient {
         GarminUploadResponse result = maybeResult.result();
         List<GarminUploadResponse.Success> successes = result.detailedImportResult().successes();
         if (successes.size() != 1) {
-            return Result.error(
-                    HttpError.of("Upload was a success but the response contained no information"));
+            return HttpError.of("Upload was a success but the response contained no information");
         }
         return Result.ok(successes.get(0).activityId());
     }
@@ -340,7 +337,7 @@ public final class GarminClient {
                         .findFirst();
 
         if (desiredGear.isEmpty()) {
-            return Result.error(HttpError.of("Cannot find requested gear"));
+            return HttpError.of("Cannot find requested gear");
         }
 
         return setGear(activityId, desiredGear.get().gearId());

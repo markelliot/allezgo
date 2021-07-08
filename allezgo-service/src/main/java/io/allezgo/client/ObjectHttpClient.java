@@ -73,7 +73,7 @@ public final class ObjectHttpClient {
             return Result.ok(
                     HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(request)));
         } catch (JsonProcessingException jpe) {
-            return Result.error(HttpError.of("Unable to serialize request body", jpe));
+            return HttpError.of("Unable to serialize request body", jpe);
         }
     }
 
@@ -81,7 +81,7 @@ public final class ObjectHttpClient {
         try {
             return Result.ok(httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString()));
         } catch (IOException | InterruptedException e) {
-            return Result.error(HttpError.of("Error while making HTTP request", e));
+            return HttpError.of("Error while making HTTP request", e);
         }
     }
 
@@ -97,10 +97,10 @@ public final class ObjectHttpClient {
             try {
                 return Result.ok(mapper.readValue(body, responseClass));
             } catch (JsonProcessingException jpe) {
-                return Result.error(HttpError.of("Unable to deserialize body", jpe));
+                return HttpError.of("Unable to deserialize body", jpe);
             }
         } else {
-            return Result.error(HttpError.of(httpResp));
+            return HttpError.of(httpResp);
         }
     }
 }
