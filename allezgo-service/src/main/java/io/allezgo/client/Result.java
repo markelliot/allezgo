@@ -31,6 +31,10 @@ public record Result<T, E>(@JsonProperty("result") T result, @JsonProperty("erro
         return !isError() ? Result.ok(fn.apply(result)) : Result.error(error);
     }
 
+    public <U> Result<U, E> flatMapResult(Function<T, Result<U, E>> fn) {
+        return !isError() ? fn.apply(result) : Result.error(error);
+    }
+
     public <F> Result<T, F> mapError(Function<E, F> fn) {
         return isError() ? Result.error(fn.apply(error)) : Result.ok(result);
     }

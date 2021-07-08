@@ -9,8 +9,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.net.HttpHeaders;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -28,53 +26,33 @@ public final class ObjectHttpClient {
 
     public <Request, Response> Result<Response, HttpError> post(
             Endpoint endpoint, Request request, Class<Response> responseClass) {
-        try {
-            String reqStr = request != null ? mapper.writeValueAsString(request) : "";
-            HttpResponse<String> httpResp =
-                    httpClient.send(
-                            newJsonRequest(endpoint)
-                                    .POST(HttpRequest.BodyPublishers.ofString(reqStr))
-                                    .build(),
-                            HttpResponse.BodyHandlers.ofString());
-            return convertResponse(httpResp, responseClass);
-        } catch (IOException | InterruptedException e) {
-            return Result.error(HttpError.of(e.getMessage()));
-        }
+        return convertRequest(request)
+                .flatMapResult(body -> send(newJsonRequest(endpoint).POST(body).build()))
+                .flatMapResult(response -> convertResponse(response, responseClass));
     }
 
     public <Response> Result<Response, HttpError> get(
             Endpoint endpoint, Class<Response> responseClass) {
-        try {
-            HttpResponse<String> httpResp =
-                    httpClient.send(
-                            newJsonRequest(endpoint).GET().build(),
-                            HttpResponse.BodyHandlers.ofString());
-            return convertResponse(httpResp, responseClass);
-        } catch (IOException | InterruptedException e) {
-            return Result.error(HttpError.of(e.getMessage()));
-        }
+        return send(newJsonRequest(endpoint).GET().build())
+                .flatMapResult(response -> convertResponse(response, responseClass));
     }
 
     public <Response> Result<Response, HttpError> upload(
             Endpoint endpoint, String filename, String fileContent, Class<Response> responseClass) {
         Forms.MultipartUpload upload = Forms.MultipartUpload.of(filename, fileContent);
 
-        try {
-            HttpRequest.Builder requestBuilder =
-                    HttpRequest.newBuilder()
-                            .uri(endpoint.uri())
-                            .setHeader(
-                                    HttpHeaders.CONTENT_TYPE,
-                                    "multipart/form-data; boundary=" + upload.boundary())
-                            .setHeader(HttpHeaders.ACCEPT, "application/json")
-                            .POST(HttpRequest.BodyPublishers.ofString(upload.content()));
-            endpoint.headers().forEach(requestBuilder::setHeader);
-            HttpResponse<String> httpResp =
-                    httpClient.send(requestBuilder.build(), HttpResponse.BodyHandlers.ofString());
-            return convertResponse(httpResp, responseClass);
-        } catch (IOException | InterruptedException e) {
-            return Result.error(HttpError.of(e.getMessage()));
-        }
+        HttpRequest.Builder requestBuilder =
+                HttpRequest.newBuilder()
+                        .uri(endpoint.uri())
+                        .setHeader(
+                                HttpHeaders.CONTENT_TYPE,
+                                "multipart/form-data; boundary=" + upload.boundary())
+                        .setHeader(HttpHeaders.ACCEPT, "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(upload.content()));
+        endpoint.headers().forEach(requestBuilder::setHeader);
+
+        return send(requestBuilder.build())
+                .flatMapResult(httpResp -> convertResponse(httpResp, responseClass));
     }
 
     private HttpRequest.Builder newJsonRequest(Endpoint endpoint) {
@@ -87,9 +65,28 @@ public final class ObjectHttpClient {
         return builder;
     }
 
+    private <Request> Result<HttpRequest.BodyPublisher, HttpError> convertRequest(Request request) {
+        if (request == null) {
+            return Result.ok(HttpRequest.BodyPublishers.ofString(""));
+        }
+        try {
+            return Result.ok(
+                    HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(request)));
+        } catch (JsonProcessingException jpe) {
+            return Result.error(HttpError.of("Unable to serialize request body", jpe));
+        }
+    }
+
+    private Result<HttpResponse<String>, HttpError> send(HttpRequest httpRequest) {
+        try {
+            return Result.ok(httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString()));
+        } catch (IOException | InterruptedException e) {
+            return Result.error(HttpError.of("Error while making HTTP request", e));
+        }
+    }
+
     private <Response> Result<Response, HttpError> convertResponse(
-            HttpResponse<String> httpResp, Class<Response> responseClass)
-            throws JsonProcessingException {
+            HttpResponse<String> httpResp, Class<Response> responseClass) {
         if (200 <= httpResp.statusCode() && httpResp.statusCode() < 300) {
             String body = httpResp.body();
             // protect against a few cases of 204 (or incorrectly not-204) empty
@@ -100,9 +97,7 @@ public final class ObjectHttpClient {
             try {
                 return Result.ok(mapper.readValue(body, responseClass));
             } catch (JsonProcessingException jpe) {
-                StringWriter sw = new StringWriter();
-                jpe.printStackTrace(new PrintWriter(sw));
-                return Result.error(HttpError.of("Unable to deserialize body: " + sw));
+                return Result.error(HttpError.of("Unable to deserialize body", jpe));
             }
         } else {
             return Result.error(HttpError.of(httpResp));
