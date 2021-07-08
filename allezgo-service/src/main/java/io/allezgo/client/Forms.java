@@ -1,5 +1,6 @@
 package io.allezgo.client;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.google.common.escape.Escaper;
@@ -14,6 +15,11 @@ public final class Forms {
     public record MultipartUpload(String boundary, String content) {
         public static MultipartUpload of(String filename, String fileContent) {
             String boundary = "----" + ThreadLocalRandom.current().nextLong();
+            return format(filename, fileContent, boundary);
+        }
+
+        @VisibleForTesting
+        static MultipartUpload format(String filename, String fileContent, String boundary) {
             String marker = "--" + boundary + "\r\n";
             String header =
                     marker
