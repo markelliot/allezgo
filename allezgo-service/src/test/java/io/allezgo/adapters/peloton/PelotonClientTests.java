@@ -1,7 +1,7 @@
 package io.allezgo.adapters.peloton;
 
-import io.allezgo.config.Configuration;
 import io.allezgo.adapters.tcx.Tcx;
+import io.allezgo.config.Configuration;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
