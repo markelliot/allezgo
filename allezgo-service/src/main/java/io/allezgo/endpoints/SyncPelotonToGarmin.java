@@ -36,7 +36,7 @@ public final class SyncPelotonToGarmin
     }
 
     @Override
-    public String template() {
+    public String path() {
         return "/api/synchronize/peloton-to-garmin";
     }
 

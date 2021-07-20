@@ -1,5 +1,6 @@
 package io.allezgo.client;
 
+import io.github.markelliot.result.Result;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.http.HttpResponse;

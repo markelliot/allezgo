@@ -9,8 +9,8 @@ import io.allezgo.client.Endpoint;
 import io.allezgo.client.Forms;
 import io.allezgo.client.HttpError;
 import io.allezgo.client.ObjectHttpClient;
-import io.allezgo.client.Result;
 import io.allezgo.config.Configuration;
+import io.github.markelliot.result.Result;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
@@ -193,9 +193,9 @@ public final class GarminClient {
     public Result<GarminActivityId, HttpError> uploadTcx(Tcx tcx) {
         Result<GarminUploadResponse, HttpError> maybeResult = rawUploadTcx(tcx);
         if (maybeResult.isError()) {
-            return maybeResult.mapResult(u -> null);
+            return maybeResult.coerce();
         }
-        GarminUploadResponse result = maybeResult.result();
+        GarminUploadResponse result = maybeResult.unwrap();
         List<GarminUploadResponse.Success> successes = result.detailedImportResult().successes();
         if (successes.size() != 1) {
             return HttpError.of("Upload was a success but the response contained no information");
@@ -322,17 +322,17 @@ public final class GarminClient {
             GarminActivityId activityId, LocalDate activityDate, String gearName) {
         Result<GarminUserId, HttpError> userId = userId();
         if (userId.isError()) {
-            return Result.error(userId.error());
+            return userId.coerce();
         }
 
         Result<List<GarminGear>, HttpError> availableGear =
-                availableGear(activityDate, userId.result());
+                availableGear(activityDate, userId.unwrap());
         if (availableGear.isError()) {
-            return Result.error(availableGear.error());
+            return availableGear.coerce();
         }
 
         Optional<GarminGear> desiredGear =
-                availableGear.result().stream()
+                availableGear.unwrap().stream()
                         .filter(g -> g.customMakeModel().equals(gearName))
                         .findFirst();
 
@@ -350,7 +350,7 @@ public final class GarminClient {
             if (!gear.gearId().equals(gearUuid)) {
                 Result<GarminGear, HttpError> deleteResult = deleteGear(activityId, gear.gearId());
                 if (deleteResult.isError()) {
-                    return deleteResult.mapResult(_r -> null);
+                    return deleteResult.coerce();
                 }
             } else {
                 desiredGear = gear;

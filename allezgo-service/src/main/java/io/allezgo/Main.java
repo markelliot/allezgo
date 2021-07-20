@@ -1,9 +1,8 @@
 package io.allezgo;
 
-import barista.Authz;
 import barista.Server;
+import barista.authz.Authz;
 import io.allezgo.endpoints.SyncPelotonToGarmin;
-import java.time.Clock;
 
 public final class Main {
     private Main() {}
@@ -14,7 +13,7 @@ public final class Main {
             return;
         }
 
-        Authz authz = new Authz("unused", "unused", Clock.systemUTC());
+        Authz authz = Authz.denyAll();
         Server.builder()
                 .disableTls() // our host provides this for us
                 .authz(authz)
