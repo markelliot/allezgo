@@ -74,7 +74,13 @@ public final class SyncPelotonToGarmin
             return new Response(null, "Unable to login to Garmin with the provided credentials");
         }
 
-        return new Response(syncLastNDays(peloton, garmin, request.numDaysToSync), null);
+        List<SyncRecord> lastNDays = null;
+        try {
+            lastNDays = syncLastNDays(peloton, garmin, request.numDaysToSync);
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+        return new Response(lastNDays, null);
     }
 
     private static List<String> checkArgs(Request request) {

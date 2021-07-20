@@ -11,6 +11,7 @@ import io.allezgo.units.Watts;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
@@ -20,10 +21,10 @@ import java.util.stream.Collectors;
 public final class TrainingCenterDatabase {
 
     private static final DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'hh:mm:ss.SSSXXX");
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
     private static final String formatInstant(Instant time) {
-        return formatter.format(OffsetDateTime.ofInstant(time, ZoneId.of("America/New_York")));
+        return formatter.format(OffsetDateTime.ofInstant(time, ZoneOffset.UTC));
     }
 
     private TrainingCenterDatabase() {}
