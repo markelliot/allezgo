@@ -10,7 +10,6 @@ import io.allezgo.units.Seconds;
 import io.allezgo.units.Watts;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;

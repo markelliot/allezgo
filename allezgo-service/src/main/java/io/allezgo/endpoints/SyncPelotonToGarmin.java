@@ -24,9 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class SyncPelotonToGarmin
         implements Endpoints.Open<SyncPelotonToGarmin.Request, SyncPelotonToGarmin.Response> {
+
+    private static final Logger log = LoggerFactory.getLogger(SyncPelotonToGarmin.class);
 
     public SyncPelotonToGarmin() {}
 
@@ -74,11 +78,17 @@ public final class SyncPelotonToGarmin
             return new Response(null, "Unable to login to Garmin with the provided credentials");
         }
 
+        log.info(
+                "Syncing {} days for Peloton: {}, Garmin: {}",
+                request.numDaysToSync,
+                request.pelotonEmail,
+                request.garminEmail);
+
         List<SyncRecord> lastNDays = null;
         try {
             lastNDays = syncLastNDays(peloton, garmin, request.numDaysToSync);
         } catch (RuntimeException e) {
-            e.printStackTrace();
+            log.error("Error during sync", e);
         }
         return new Response(lastNDays, null);
     }
