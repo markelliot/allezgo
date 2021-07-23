@@ -15,6 +15,8 @@ import io.allezgo.adapters.peloton.RidePointer;
 import io.allezgo.adapters.tcx.Tcx;
 import io.allezgo.client.HttpError;
 import io.allezgo.config.Configuration;
+import io.allezgo.events.Events;
+import io.allezgo.events.PelotonToGarminSyncEvent;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -78,11 +80,9 @@ public final class SyncPelotonToGarmin
             return new Response(null, "Unable to login to Garmin with the provided credentials");
         }
 
-        log.info(
-                "Syncing {} days for Peloton: {}, Garmin: {}",
-                request.numDaysToSync,
-                request.pelotonEmail,
-                request.garminEmail);
+        Events.record(
+                PelotonToGarminSyncEvent.of(
+                        request.pelotonEmail, request.garminEmail, request.numDaysToSync));
 
         List<SyncRecord> lastNDays = null;
         try {
