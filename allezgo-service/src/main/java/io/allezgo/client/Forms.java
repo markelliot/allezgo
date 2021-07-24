@@ -14,7 +14,7 @@ public final class Forms {
 
     public record MultipartUpload(String boundary, String content) {
         public static MultipartUpload of(String filename, String fileContent) {
-            String boundary = "----" + Math.abs(ThreadLocalRandom.current().nextLong());
+            String boundary = "----" + Math.abs(ThreadLocalRandom.current().nextLong() / 2);
             return format(filename, fileContent, boundary);
         }
 

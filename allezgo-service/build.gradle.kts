@@ -13,12 +13,6 @@ dependencies {
     implementation("io.github.markelliot.barista:barista")
     implementation("io.github.markelliot.result:result")
 
-    // logging
-    implementation("org.apache.logging.log4j:log4j-core")
-    implementation("org.apache.logging.log4j:log4j-jul")
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl")
-    implementation("org.slf4j:slf4j-api")
-
     compileOnly("org.immutables:value::annotations")
     annotationProcessor("org.immutables:value")
 
