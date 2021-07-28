@@ -1,7 +1,9 @@
 package io.allezgo;
 
 import barista.Server;
+import barista.tracing.Spans;
 import io.allezgo.endpoints.SyncPelotonToGarmin;
+import io.allezgo.events.Events;
 
 public final class Main {
     private Main() {}
@@ -12,11 +14,14 @@ public final class Main {
             return;
         }
 
+        Spans.register("honeycomb.io", cs -> Events.span("allezgo", cs));
+
         Server.builder()
                 .disableTls() // our host provides this for us
                 .endpoint(new SyncPelotonToGarmin())
                 .allowOrigin("https://allezgo.io")
                 .allowOrigin("http://localhost:8080") // for development
+                .tracingRate(1.0)
                 .start();
     }
 }

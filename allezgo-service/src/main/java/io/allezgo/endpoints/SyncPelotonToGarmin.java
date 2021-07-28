@@ -2,6 +2,8 @@ package io.allezgo.endpoints;
 
 import barista.Endpoints;
 import barista.HttpMethod;
+import barista.tracing.Span;
+import barista.tracing.Spans;
 import com.google.common.base.Strings;
 import io.allezgo.adapters.garmin.GarminActivity;
 import io.allezgo.adapters.garmin.GarminActivityId;
@@ -65,8 +67,11 @@ public final class SyncPelotonToGarmin
                 new PelotonClient(
                         new Configuration.Peloton(request.pelotonEmail, request.pelotonPassword));
 
-        if (!peloton.validateLogin()) {
-            return new Response(null, "Unable to login to Peloton with the provided credentials");
+        try (Span ignored = Spans.forCurrentTrace("validatePelotonLogin")) {
+            if (!peloton.validateLogin()) {
+                return new Response(
+                        null, "Unable to login to Peloton with the provided credentials");
+            }
         }
 
         GarminClient garmin =
@@ -76,13 +81,18 @@ public final class SyncPelotonToGarmin
                                 request.garminPassword,
                                 request.garminPelotonGearName));
 
-        if (!garmin.validateLogin()) {
-            return new Response(null, "Unable to login to Garmin with the provided credentials");
+        try (Span ignored = Spans.forCurrentTrace("validateGarminLogin")) {
+            if (!garmin.validateLogin()) {
+                return new Response(
+                        null, "Unable to login to Garmin with the provided credentials");
+            }
         }
 
-        Events.record(
-                PelotonToGarminSyncEvent.of(
-                        request.pelotonEmail, request.garminEmail, request.numDaysToSync));
+        try (Span ignored = Spans.forCurrentTrace("sendHoneycombEvent")) {
+            Events.record(
+                    PelotonToGarminSyncEvent.of(
+                            request.pelotonEmail, request.garminEmail, request.numDaysToSync));
+        }
 
         List<SyncRecord> lastNDays = null;
         try {
@@ -135,10 +145,13 @@ public final class SyncPelotonToGarmin
             PelotonClient peloton, GarminClient garmin, int numDays) {
         Instant thirtyDaysAgo = Instant.now().minus(Period.ofDays(numDays));
 
-        List<GarminActivity> garminActivitiesLastMonth =
-                garmin.activitiesAsStream()
-                        .takeWhile(ga -> ga.tcxId().isAfter(thirtyDaysAgo))
-                        .toList();
+        List<GarminActivity> garminActivitiesLastMonth;
+        try (Span ignored = Spans.forCurrentTrace("garminActivitiesLastMonth")) {
+            garminActivitiesLastMonth =
+                    garmin.activitiesAsStream()
+                            .takeWhile(ga -> ga.tcxId().isAfter(thirtyDaysAgo))
+                            .toList();
+        }
 
         return peloton.activitiesAsStream()
                 .takeWhile(pa -> pa.tcxId().isAfter(thirtyDaysAgo))

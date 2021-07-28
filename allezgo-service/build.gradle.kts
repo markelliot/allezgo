@@ -11,6 +11,7 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("com.google.guava:guava")
     implementation("io.github.markelliot.barista:barista")
+    implementation("io.github.markelliot.barista-tracing:barista-tracing")
     implementation("io.github.markelliot.result:result")
 
     compileOnly("org.immutables:value::annotations")
