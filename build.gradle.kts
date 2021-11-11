@@ -60,7 +60,7 @@ allprojects {
         val imageName = "${project.name}:${project.version}"
         configure<JibExtension> {
             from {
-                image = "azul/zulu-openjdk:16"
+                image = "azul/zulu-openjdk:17"
             }
             to {
                 image = imageName
