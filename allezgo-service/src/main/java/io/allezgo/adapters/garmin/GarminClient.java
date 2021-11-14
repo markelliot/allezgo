@@ -17,6 +17,7 @@ import java.net.CookiePolicy;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
@@ -113,6 +114,8 @@ public final class GarminClient {
             HttpResponse<String> loginResp =
                     client.send(
                             HttpRequest.newBuilder()
+                                    // sadly we observe a 403 when using HTTP_2
+                                    .version(Version.HTTP_1_1)
                                     .uri(LOGIN_URI)
                                     .setHeader(HttpHeaders.ORIGIN, GARMIN_SSO)
                                     .setHeader(
