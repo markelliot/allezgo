@@ -27,7 +27,7 @@ Today, the service offers only very basic functionality, with the following endp
    * `result`: when credentials were valid and a synchronization was performed, a list of:
      * `activityDate`: `yyyy-MM-dd` format date of the activity
      * `title`: title of this activity
-     * `descruption`: description of this activity
+     * `description`: description of this activity
      * `pelotonLink`: the URL a user would use to view this activity on the Peloton website
      * `garminLink`: the URL a user would use to view this activity on Garmin Connect
      * `wasCreated`: true when the synchronize action caused this ride to be created in Garmin Connect
