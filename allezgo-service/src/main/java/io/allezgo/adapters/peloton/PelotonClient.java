@@ -2,11 +2,11 @@ package io.allezgo.adapters.peloton;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Suppliers;
+import com.markelliot.result.Result;
 import io.allezgo.client.Endpoint;
 import io.allezgo.client.HttpError;
 import io.allezgo.client.ObjectHttpClient;
 import io.allezgo.config.Configuration;
-import io.github.markelliot.result.Result;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;

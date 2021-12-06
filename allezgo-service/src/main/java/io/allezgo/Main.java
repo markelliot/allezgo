@@ -1,7 +1,7 @@
 package io.allezgo;
 
-import barista.Server;
-import barista.tracing.Spans;
+import com.markelliot.barista.Server;
+import com.markelliot.barista.tracing.Spans;
 import io.allezgo.endpoints.SyncPelotonToGarmin;
 import io.allezgo.events.Events;
 

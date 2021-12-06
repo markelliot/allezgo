@@ -1,10 +1,10 @@
 package io.allezgo.endpoints;
 
-import barista.Endpoints;
-import barista.HttpMethod;
-import barista.tracing.Span;
-import barista.tracing.Spans;
 import com.google.common.base.Strings;
+import com.markelliot.barista.Endpoints;
+import com.markelliot.barista.HttpMethod;
+import com.markelliot.barista.tracing.Span;
+import com.markelliot.barista.tracing.Spans;
 import io.allezgo.adapters.garmin.GarminActivity;
 import io.allezgo.adapters.garmin.GarminActivityId;
 import io.allezgo.adapters.garmin.GarminClient;

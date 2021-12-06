@@ -1,6 +1,6 @@
 package io.allezgo.events;
 
-import barista.tracing.CompletedSpan;
+import com.markelliot.barista.tracing.CompletedSpan;
 import io.allezgo.client.Endpoint;
 import io.allezgo.client.ObjectHttpClient;
 

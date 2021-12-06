@@ -8,7 +8,7 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.net.HttpHeaders;
-import io.github.markelliot.result.Result;
+import com.markelliot.result.Result;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;

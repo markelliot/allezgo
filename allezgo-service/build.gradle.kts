@@ -10,9 +10,9 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     implementation("com.google.guava:guava")
-    implementation("io.github.markelliot.barista:barista")
-    implementation("io.github.markelliot.barista-tracing:barista-tracing")
-    implementation("io.github.markelliot.result:result")
+    implementation("com.markelliot.barista:barista")
+    implementation("com.markelliot.barista.tracing:barista-tracing")
+    implementation("com.markelliot.result:result")
 
     compileOnly("org.immutables:value::annotations")
     annotationProcessor("org.immutables:value")

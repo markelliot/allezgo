@@ -36,7 +36,11 @@ final class PelotonClientTests {
         System.out.println();
 
         Tcx tcxFile = PelotonToTcx.convertToTcx(activity, ride, metrics);
-        Files.writeString(TCX_FILE, tcxFile.value(), StandardOpenOption.TRUNCATE_EXISTING);
+        Files.writeString(
+                TCX_FILE,
+                tcxFile.value(),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
         System.out.print("Wrote " + TCX_FILE);
     }
 }

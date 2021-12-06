@@ -30,27 +30,6 @@ allprojects {
 
     // lives in allprojects because of consistent-versions
     repositories {
-        maven {
-            url = uri("https://maven.pkg.github.com/markelliot/barista")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GH_READ_PACKAGES_TOKEN")
-            }
-        }
-        maven {
-            url = uri("https://maven.pkg.github.com/markelliot/barista-tracing")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GH_READ_PACKAGES_TOKEN")
-            }
-        }
-        maven {
-            url = uri("https://maven.pkg.github.com/markelliot/result")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GH_READ_PACKAGES_TOKEN")
-            }
-        }
         mavenCentral()
     }
 
