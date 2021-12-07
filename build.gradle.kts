@@ -71,6 +71,8 @@ allprojects {
         }
 
         the<JavaPluginExtension>().sourceCompatibility = JavaVersion.VERSION_16
+
+        tasks["check"].dependsOn("spotlessCheck")
     }
 
     spotless {
@@ -79,7 +81,6 @@ allprojects {
         }
     }
 
-    tasks["check"].dependsOn("spotlessCheck")
     tasks.register("format").get().dependsOn("spotlessApply")
 }
 
