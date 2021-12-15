@@ -37,6 +37,10 @@ public record Configuration(Peloton peloton, Garmin garmin) {
         }
     }
 
+    public static boolean defaultFileExists() {
+        return DEFAULT_FILE.exists();
+    }
+
     public static String renderExample() {
         Configuration example =
                 new Configuration(

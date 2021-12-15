@@ -1,5 +1,7 @@
 package io.allezgo.adapters.garmin;
 
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
 import io.allezgo.config.Configuration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -7,6 +9,8 @@ import org.junit.jupiter.api.Test;
 final class GarminClientTests {
     @Test
     public void fetchLast10GarminActivitiesAndPrintTitleAndDescription() throws Exception {
+        assumeTrue(Configuration.defaultFileExists());
+
         Configuration conf = Configuration.fromDefaultFile();
         GarminClient garmin = new GarminClient(conf.garmin());
 
@@ -21,6 +25,8 @@ final class GarminClientTests {
 
     @Test
     public void fetchLatestGarminActivityAndSetGearToPeloton() throws Exception {
+        assumeTrue(Configuration.defaultFileExists());
+
         Configuration conf = Configuration.fromDefaultFile();
         GarminClient garmin = new GarminClient(conf.garmin());
 

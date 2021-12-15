@@ -1,5 +1,7 @@
 package io.allezgo.adapters.peloton;
 
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
+
 import io.allezgo.adapters.tcx.Tcx;
 import io.allezgo.config.Configuration;
 import java.nio.file.Files;
@@ -13,6 +15,8 @@ final class PelotonClientTests {
 
     @Test
     void fetchLastActivityAndWriteTcxFile() throws Exception {
+        assumeTrue(Configuration.defaultFileExists());
+
         PelotonClient client = new PelotonClient(Configuration.fromDefaultFile().peloton());
         PelotonActivities activities = client.activities(0, 10).orElseThrow();
 
