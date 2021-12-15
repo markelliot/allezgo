@@ -1,0 +1,23 @@
+name: Update Deps
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 0/6 * * *'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GH_PUSH_TO_REPO_TOKEN }}
+      - uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+      - uses: markelliot/update-gradle-deps@v1
+        with:
+          push-to-repo-token: ${{ secrets.GH_PUSH_TO_REPO_TOKEN }}
+          commit-user: mellbot
+          commit-email: mellbot@users.noreply.github.com
+
