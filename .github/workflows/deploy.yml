@@ -8,7 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions: 
       contents: read
-      packages: write 
+    env:
+      GRADLE_OPTS: -Dorg.gradle.console=plain
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
