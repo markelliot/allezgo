@@ -9,6 +9,6 @@ com.markelliot.barista.tracing:barista-tracing = 0.3.0
 com.markelliot.result:result = 0.2.3
 io.undertow:undertow-core = 2.1.0.Final
 org.assertj:assertj-core = 3.22.0
-org.immutables:* = 2.8.8
+org.immutables:* = 2.9.0
 org.junit:junit-bom = 5.8.2
 org.junit.jupiter:junit-jupiter-engine = 5.8.2
