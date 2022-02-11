@@ -4,4 +4,4 @@ build
 *.ipr
 *.iws
 out
-
+generated_*

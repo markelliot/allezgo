@@ -14,6 +14,9 @@ dependencies {
     implementation("com.markelliot.barista.tracing:barista-tracing")
     implementation("com.markelliot.result:result")
 
+    compileOnly("com.markelliot.barista:barista-annotations")
+    annotationProcessor("com.markelliot.barista:barista-processor")
+
     compileOnly("org.immutables:value::annotations")
     annotationProcessor("org.immutables:value")
 

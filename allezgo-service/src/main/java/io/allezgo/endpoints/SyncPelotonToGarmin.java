@@ -1,8 +1,7 @@
 package io.allezgo.endpoints;
 
 import com.google.common.base.Strings;
-import com.markelliot.barista.Endpoints;
-import com.markelliot.barista.HttpMethod;
+import com.markelliot.barista.annotations.Http;
 import com.markelliot.barista.tracing.Span;
 import com.markelliot.barista.tracing.Spans;
 import io.allezgo.adapters.garmin.GarminActivity;
@@ -31,29 +30,13 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class SyncPelotonToGarmin
-        implements Endpoints.Open<SyncPelotonToGarmin.Request, SyncPelotonToGarmin.Response> {
+public final class SyncPelotonToGarmin {
 
     private static final Logger log = LoggerFactory.getLogger(SyncPelotonToGarmin.class);
 
     public SyncPelotonToGarmin() {}
 
-    @Override
-    public Class<Request> requestClass() {
-        return Request.class;
-    }
-
-    @Override
-    public String path() {
-        return "/api/synchronize/peloton-to-garmin";
-    }
-
-    @Override
-    public HttpMethod method() {
-        return HttpMethod.PUT;
-    }
-
-    @Override
+    @Http.Put("/api/synchronize/peloton-to-garmin")
     public Response call(Request request) {
         List<String> failingArgs = checkArgs(request);
         if (!failingArgs.isEmpty()) {
