@@ -8,8 +8,7 @@ public record PelotonToGarminSyncEvent(
         @JsonProperty("garmin-user") String garminEmail,
         @JsonProperty("num-days") int numDaysToSync)
         implements Event {
-    public static PelotonToGarminSyncEvent of(
-            String pelotonEmail, String garminEmail, int numDays) {
+    public static PelotonToGarminSyncEvent of(String pelotonEmail, String garminEmail, int numDays) {
         return new PelotonToGarminSyncEvent("ptg", pelotonEmail, garminEmail, numDays);
     }
 }

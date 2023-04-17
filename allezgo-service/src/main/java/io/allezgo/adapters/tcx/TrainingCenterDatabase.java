@@ -19,8 +19,7 @@ import java.util.stream.Collectors;
 
 public final class TrainingCenterDatabase {
 
-    private static final DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
     private static final String formatInstant(Instant time) {
         return formatter.format(OffsetDateTime.ofInstant(time, ZoneOffset.UTC));
@@ -28,11 +27,7 @@ public final class TrainingCenterDatabase {
 
     private TrainingCenterDatabase() {}
 
-    public record Lap(
-            Instant startTime,
-            Seconds totalSeconds,
-            Calories calories,
-            List<Trackpoint> trackpoints) {}
+    public record Lap(Instant startTime, Seconds totalSeconds, Calories calories, List<Trackpoint> trackpoints) {}
 
     public record Trackpoint(
             Instant time,
@@ -43,14 +38,13 @@ public final class TrainingCenterDatabase {
             Miles distance) {}
 
     private static String renderTrackpoint(Trackpoint trackpoint) {
-        Map<String, Object> params =
-                Map.of(
-                        "{time}", formatInstant(trackpoint.time),
-                        "{heartRate}", trackpoint.heartRate.value(),
-                        "{cadence}", trackpoint.cadence.value(),
-                        "{speed}", trackpoint.speed.toMetersPerSecond(),
-                        "{power}", (int) trackpoint.power.value(),
-                        "{distance}", trackpoint.distance.toMeters());
+        Map<String, Object> params = Map.of(
+                "{time}", formatInstant(trackpoint.time),
+                "{heartRate}", trackpoint.heartRate.value(),
+                "{cadence}", trackpoint.cadence.value(),
+                "{speed}", trackpoint.speed.toMetersPerSecond(),
+                "{power}", (int) trackpoint.power.value(),
+                "{distance}", trackpoint.distance.toMeters());
         return substitute(
                 """
                 <Trackpoint>
@@ -110,27 +104,26 @@ public final class TrainingCenterDatabase {
         double averageSpeed = lapDistanceMeters / lap.totalSeconds().value();
         double averageWatts = wattsSum / lap.trackpoints().size();
 
-        Map<String, Object> params =
-                ImmutableMap.<String, Object>builder()
-                        .put("{startTime}", formatInstant(lap.startTime))
-                        .put("{totalTimeSeconds}", lap.totalSeconds.value())
-                        .put("{distance}", lapDistanceMeters)
-                        .put("{maximumSpeed}", maximumSpeed)
-                        .put("{calories}", lap.calories().value())
-                        .put("{averageHeartRateBpm}", (int) averageHeartRateBpm)
-                        .put("{maximumHeartRateBpm}", (int) maximumHeartRateBpm)
-                        .put("{maximumWatts}", maximumWatts)
-                        .put("{averageWatts}", averageWatts)
-                        .put("{averageSpeed}", averageSpeed)
-                        .put("{averageCadence}", averageCadence)
-                        .put("{maximumCadence}", maximumCadence)
-                        .put(
-                                "{trackpoints}",
-                                lap.trackpoints.stream()
-                                        .map(TrainingCenterDatabase::renderTrackpoint)
-                                        .collect(Collectors.joining())
-                                        .indent(4))
-                        .build();
+        Map<String, Object> params = ImmutableMap.<String, Object>builder()
+                .put("{startTime}", formatInstant(lap.startTime))
+                .put("{totalTimeSeconds}", lap.totalSeconds.value())
+                .put("{distance}", lapDistanceMeters)
+                .put("{maximumSpeed}", maximumSpeed)
+                .put("{calories}", lap.calories().value())
+                .put("{averageHeartRateBpm}", (int) averageHeartRateBpm)
+                .put("{maximumHeartRateBpm}", (int) maximumHeartRateBpm)
+                .put("{maximumWatts}", maximumWatts)
+                .put("{averageWatts}", averageWatts)
+                .put("{averageSpeed}", averageSpeed)
+                .put("{averageCadence}", averageCadence)
+                .put("{maximumCadence}", maximumCadence)
+                .put(
+                        "{trackpoints}",
+                        lap.trackpoints.stream()
+                                .map(TrainingCenterDatabase::renderTrackpoint)
+                                .collect(Collectors.joining())
+                                .indent(4))
+                .build();
         return substitute(
                 """
                 <Lap StartTime="{startTime}">
@@ -164,20 +157,18 @@ public final class TrainingCenterDatabase {
     }
 
     public static Tcx render(String className, Instant start, List<Lap> laps) {
-        Map<String, Object> params =
-                Map.of(
-                        "{id}",
-                        formatInstant(start),
-                        "{laps}",
-                        laps.stream()
-                                .map(TrainingCenterDatabase::renderLaps)
-                                .collect(Collectors.joining())
-                                .indent(6),
-                        "{notes}",
-                        className);
-        return Tcx.of(
-                substitute(
-                        """
+        Map<String, Object> params = Map.of(
+                "{id}",
+                formatInstant(start),
+                "{laps}",
+                laps.stream()
+                        .map(TrainingCenterDatabase::renderLaps)
+                        .collect(Collectors.joining())
+                        .indent(6),
+                "{notes}",
+                className);
+        return Tcx.of(substitute(
+                """
                     <?xml version='1.0' encoding='UTF-8'?>
                     <TrainingCenterDatabase
                       xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd"
@@ -196,16 +187,13 @@ public final class TrainingCenterDatabase {
                       </Activities>
                     </TrainingCenterDatabase>
                     """,
-                        params));
+                params));
     }
 
     private static String substitute(String string, Map<String, Object> substitutions) {
         String result = string;
         for (Map.Entry<String, Object> substitution : substitutions.entrySet()) {
-            result =
-                    result.replaceAll(
-                            Pattern.quote(substitution.getKey()),
-                            String.valueOf(substitution.getValue()));
+            result = result.replaceAll(Pattern.quote(substitution.getKey()), String.valueOf(substitution.getValue()));
         }
         return result;
     }

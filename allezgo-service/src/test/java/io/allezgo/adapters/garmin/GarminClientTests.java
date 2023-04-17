@@ -14,13 +14,10 @@ final class GarminClientTests {
         Configuration conf = Configuration.fromDefaultFile();
         GarminClient garmin = new GarminClient(conf.garmin());
 
-        garmin.activities(0, 10)
-                .orElseThrow()
-                .forEach(
-                        a -> {
-                            System.out.println(a.tcxId() + ": " + a.activityName());
-                            System.out.println(a.description().orElse("").indent(2));
-                        });
+        garmin.activities(0, 10).orElseThrow().forEach(a -> {
+            System.out.println(a.tcxId() + ": " + a.activityName());
+            System.out.println(a.description().orElse("").indent(2));
+        });
     }
 
     @Test
@@ -35,9 +32,9 @@ final class GarminClientTests {
         System.out.println(activity.tcxId() + ": " + activity.activityName());
         System.out.println(activity.description().orElse("").indent(2));
 
-        List<GarminGear> availableGear =
-                garmin.availableGear(activity.gearDate(), garmin.userId().orElseThrow())
-                        .orElseThrow();
+        List<GarminGear> availableGear = garmin.availableGear(
+                        activity.gearDate(), garmin.userId().orElseThrow())
+                .orElseThrow();
         for (GarminGear gear : availableGear) {
             if (gear.customMakeModel().equals("Peloton")) {
                 System.out.println("Setting gear to Peloton");

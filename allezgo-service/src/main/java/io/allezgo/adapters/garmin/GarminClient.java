@@ -36,12 +36,10 @@ public final class GarminClient {
     private static final Endpoint.Base base = Endpoint.of("https://connect.garmin.com/modern/");
 
     private static final URI APP_URI = URI.create("https://connect.garmin.com/modern/");
-    private static final URI LOGIN_URI =
-            URI.create(
-                    "https://sso.garmin.com/sso/signin"
-                            + "?service=https://connect.garmin.com/modern"
-                            + "&clientId=GarminConnect"
-                            + "&gauthHost=https://sso.garmin.com/sso&consumeServiceTicket=false");
+    private static final URI LOGIN_URI = URI.create("https://sso.garmin.com/sso/signin"
+            + "?service=https://connect.garmin.com/modern"
+            + "&clientId=GarminConnect"
+            + "&gauthHost=https://sso.garmin.com/sso&consumeServiceTicket=false");
     private static final String GARMIN_SSO = "https://sso.garmin.com";
 
     private final Supplier<GarminSession> session;
@@ -49,10 +47,7 @@ public final class GarminClient {
 
     public GarminClient(Configuration.Garmin conf) {
         this.session =
-                Suppliers.memoize(
-                        () ->
-                                login(conf.email(), conf.password())
-                                        .orElseThrow(HttpError::toException));
+                Suppliers.memoize(() -> login(conf.email(), conf.password()).orElseThrow(HttpError::toException));
         this.pelotonGear = conf.pelotonGear();
     }
 
@@ -106,34 +101,21 @@ public final class GarminClient {
      * precise.
      */
     public Result<GarminSession, HttpError> login(String email, String password) {
-        CookieManager cookieHandler =
-                new CookieManager(/* InMemoryCookieStore */ null, CookiePolicy.ACCEPT_ALL);
+        CookieManager cookieHandler = new CookieManager(/* InMemoryCookieStore */ null, CookiePolicy.ACCEPT_ALL);
         HttpClient client = HttpClient.newBuilder().cookieHandler(cookieHandler).build();
 
         try {
-            HttpResponse<String> loginResp =
-                    client.send(
-                            HttpRequest.newBuilder()
-                                    // sadly we observe a 403 when using HTTP_2
-                                    .version(Version.HTTP_1_1)
-                                    .uri(LOGIN_URI)
-                                    .setHeader(HttpHeaders.ORIGIN, GARMIN_SSO)
-                                    .setHeader(
-                                            HttpHeaders.CONTENT_TYPE,
-                                            MediaType.FORM_DATA.toString())
-                                    .POST(
-                                            Forms.bodyPublisher(
-                                                    Map.of(
-                                                            "username",
-                                                            email,
-                                                            "password",
-                                                            password,
-                                                            "_eventId",
-                                                            "submit",
-                                                            "embed",
-                                                            "true")))
-                                    .build(),
-                            HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> loginResp = client.send(
+                    HttpRequest.newBuilder()
+                            // sadly we observe a 403 when using HTTP_2
+                            .version(Version.HTTP_1_1)
+                            .uri(LOGIN_URI)
+                            .setHeader(HttpHeaders.ORIGIN, GARMIN_SSO)
+                            .setHeader(HttpHeaders.CONTENT_TYPE, MediaType.FORM_DATA.toString())
+                            .POST(Forms.bodyPublisher(Map.of(
+                                    "username", email, "password", password, "_eventId", "submit", "embed", "true")))
+                            .build(),
+                    HttpResponse.BodyHandlers.ofString());
 
             if (loginResp.statusCode() != 200) {
                 return HttpError.of(loginResp, "Error while logging in");
@@ -142,10 +124,8 @@ public final class GarminClient {
             int count = 0;
             URI location = APP_URI;
             while (true) {
-                HttpResponse<String> initTicketResp =
-                        client.send(
-                                HttpRequest.newBuilder().uri(location).GET().build(),
-                                HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> initTicketResp = client.send(
+                        HttpRequest.newBuilder().uri(location).GET().build(), HttpResponse.BodyHandlers.ofString());
 
                 if (initTicketResp.statusCode() == 200) {
                     break;
@@ -184,8 +164,7 @@ public final class GarminClient {
                 .map(HttpCookie::getValue);
     }
 
-    private Optional<String> findCookieOnDomain(
-            CookieManager cookieHandler, String cookieName, String domain) {
+    private Optional<String> findCookieOnDomain(CookieManager cookieHandler, String cookieName, String domain) {
         return cookieHandler.getCookieStore().getCookies().stream()
                 .filter(c -> c.getName().equals(cookieName))
                 .filter(c -> c.getDomain().equals(domain))
@@ -199,7 +178,8 @@ public final class GarminClient {
             return maybeResult.coerce();
         }
         GarminUploadResponse result = maybeResult.unwrap();
-        List<GarminUploadResponse.Success> successes = result.detailedImportResult().successes();
+        List<GarminUploadResponse.Success> successes =
+                result.detailedImportResult().successes();
         if (successes.size() != 1) {
             return HttpError.of("Upload was a success but the response contained no information");
         }
@@ -220,9 +200,7 @@ public final class GarminClient {
     public Result<GarminUpdateActivityResponse, HttpError> updateActivity(
             GarminActivityId activityId, String title, String description) {
         Result<GarminUpdateActivityResponse, HttpError> resp =
-                updateActivityField(
-                        activityId,
-                        new GarminUpdateActivityTitleRequest(activityId.asLong(), title));
+                updateActivityField(activityId, new GarminUpdateActivityTitleRequest(activityId.asLong(), title));
 
         if (resp.isError()) {
             return resp;
@@ -230,8 +208,7 @@ public final class GarminClient {
 
         // TODO(markelliot): ideally we'd make a single request so that this is transactional
         return updateActivityField(
-                activityId,
-                new GarminUpdateActivityDescriptionRequest(activityId.asLong(), description));
+                activityId, new GarminUpdateActivityDescriptionRequest(activityId.asLong(), description));
     }
 
     private Result<GarminUpdateActivityResponse, HttpError> updateActivityField(
@@ -248,12 +225,7 @@ public final class GarminClient {
 
     public Result<List<GarminActivity>, HttpError> activities(int start, int limit) {
         return client.get(
-                        base.path(
-                                        "proxy",
-                                        "activitylist-service",
-                                        "activities",
-                                        "search",
-                                        "activities")
+                        base.path("proxy", "activitylist-service", "activities", "search", "activities")
                                 .query("limit", limit)
                                 .query("start", start)
                                 .header("nk", "NT")
@@ -269,8 +241,7 @@ public final class GarminClient {
                         new Iterator<>() {
                             private List<GarminActivity> activities =
                                     activities(0, 20).orElseThrow(HttpError::toException);
-                            private Iterator<GarminActivity> currentPageIter =
-                                    activities.iterator();
+                            private Iterator<GarminActivity> currentPageIter = activities.iterator();
                             private int start = 0;
 
                             @Override
@@ -280,8 +251,7 @@ public final class GarminClient {
                                 }
                                 // TODO(markelliot): not great that we have to do this in hasNext()
                                 start += 20;
-                                activities =
-                                        activities(start, 20).orElseThrow(HttpError::toException);
+                                activities = activities(start, 20).orElseThrow(HttpError::toException);
                                 currentPageIter = activities.iterator();
                                 return currentPageIter.hasNext();
                             }
@@ -328,16 +298,14 @@ public final class GarminClient {
             return userId.coerce();
         }
 
-        Result<List<GarminGear>, HttpError> availableGear =
-                availableGear(activityDate, userId.unwrap());
+        Result<List<GarminGear>, HttpError> availableGear = availableGear(activityDate, userId.unwrap());
         if (availableGear.isError()) {
             return availableGear.coerce();
         }
 
-        Optional<GarminGear> desiredGear =
-                availableGear.unwrap().stream()
-                        .filter(g -> g.customMakeModel().equals(gearName))
-                        .findFirst();
+        Optional<GarminGear> desiredGear = availableGear.unwrap().stream()
+                .filter(g -> g.customMakeModel().equals(gearName))
+                .findFirst();
 
         if (desiredGear.isEmpty()) {
             return HttpError.of("Cannot find requested gear");
@@ -346,8 +314,7 @@ public final class GarminClient {
         return setGear(activityId, desiredGear.get().gearId());
     }
 
-    public Result<GarminGear, HttpError> setGear(
-            GarminActivityId activityId, GarminGearId gearUuid) {
+    public Result<GarminGear, HttpError> setGear(GarminActivityId activityId, GarminGearId gearUuid) {
         GarminGear desiredGear = null;
         for (GarminGear gear : gear(activityId).orElseThrow(HttpError::toException)) {
             if (!gear.gearId().equals(gearUuid)) {
@@ -365,17 +332,9 @@ public final class GarminClient {
         return Result.ok(desiredGear);
     }
 
-    private Result<GarminGear, HttpError> deleteGear(
-            GarminActivityId activityId, GarminGearId gearUuid) {
+    private Result<GarminGear, HttpError> deleteGear(GarminActivityId activityId, GarminGearId gearUuid) {
         return client.post(
-                base.path(
-                                "proxy",
-                                "gear-service",
-                                "gear",
-                                "unlink",
-                                gearUuid.value(),
-                                "activity",
-                                activityId.value())
+                base.path("proxy", "gear-service", "gear", "unlink", gearUuid.value(), "activity", activityId.value())
                         .header("nk", "NT")
                         .header("x-http-method-override", "PUT")
                         .header("cookie", session.get().toCookies())
@@ -384,17 +343,9 @@ public final class GarminClient {
                 GarminGear.class);
     }
 
-    private Result<GarminGear, HttpError> addGear(
-            GarminActivityId activityId, GarminGearId gearUuid) {
+    private Result<GarminGear, HttpError> addGear(GarminActivityId activityId, GarminGearId gearUuid) {
         return client.post(
-                base.path(
-                                "proxy",
-                                "gear-service",
-                                "gear",
-                                "link",
-                                gearUuid.value(),
-                                "activity",
-                                activityId.value())
+                base.path("proxy", "gear-service", "gear", "link", gearUuid.value(), "activity", activityId.value())
                         .header("nk", "NT")
                         .header("x-http-method-override", "PUT")
                         .header("cookie", session.get().toCookies())

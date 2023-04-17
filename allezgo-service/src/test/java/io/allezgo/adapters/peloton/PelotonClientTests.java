@@ -20,14 +20,10 @@ final class PelotonClientTests {
         PelotonClient client = new PelotonClient(Configuration.fromDefaultFile().peloton());
         PelotonActivities activities = client.activities(0, 10).orElseThrow();
 
-        PelotonActivity activity =
-                activities.data().stream()
-                        .filter(a -> a.ride().isPresent())
-                        .findFirst()
-                        .orElseThrow(
-                                () ->
-                                        new IllegalStateException(
-                                                "Last 10 activities do not include a ride"));
+        PelotonActivity activity = activities.data().stream()
+                .filter(a -> a.ride().isPresent())
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Last 10 activities do not include a ride"));
 
         RidePointer ridePtr = activity.ride().get();
         Ride ride = client.ride(ridePtr).orElseThrow();
@@ -40,11 +36,7 @@ final class PelotonClientTests {
         System.out.println();
 
         Tcx tcxFile = PelotonToTcx.convertToTcx(activity, ride, metrics);
-        Files.writeString(
-                TCX_FILE,
-                tcxFile.value(),
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
+        Files.writeString(TCX_FILE, tcxFile.value(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         System.out.print("Wrote " + TCX_FILE);
     }
 }

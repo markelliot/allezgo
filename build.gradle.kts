@@ -3,10 +3,10 @@ import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
     idea
-    id("com.diffplug.spotless") version "6.17.0"
+    id("com.diffplug.spotless") version "6.18.0"
     id("com.google.cloud.tools.jib") version "3.3.1" apply false
-    id("com.markelliot.versions") version "0.43.0"
     id("com.palantir.consistent-versions") version "2.12.0"
+    id("com.markelliot.versions") version "0.43.0"
     id("net.ltgt.errorprone") version "3.0.1" apply false
     id("org.inferred.processors") version "3.7.0" apply false
 }
@@ -28,7 +28,6 @@ allprojects {
 allprojects {
     apply(plugin = "idea")
     apply(plugin = "com.diffplug.spotless")
-    apply(plugin = "com.markelliot.versions")
 
     // lives in allprojects because of consistent-versions
     repositories {
@@ -64,7 +63,7 @@ allprojects {
 
         spotless {
             java {
-                googleJavaFormat("1.10.0").aosp()
+                palantirJavaFormat()
             }
         }
 

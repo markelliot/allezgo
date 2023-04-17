@@ -38,6 +38,5 @@ public record Ride(RideDescription ride, Averages averages, Segments segments) {
 
     public record Segments(@JsonProperty("segment_list") List<Segment> segments) {}
 
-    public record Segment(
-            String name, @JsonProperty("start_time_offset") Seconds startTime, Seconds length) {}
+    public record Segment(String name, @JsonProperty("start_time_offset") Seconds startTime, Seconds length) {}
 }

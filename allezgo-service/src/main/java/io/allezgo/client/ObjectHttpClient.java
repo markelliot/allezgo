@@ -15,13 +15,12 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public final class ObjectHttpClient {
-    private static final ObjectMapper mapper =
-            new ObjectMapper()
-                    .registerModule(new GuavaModule())
-                    .registerModule(new Jdk8Module())
-                    .registerModule(new JavaTimeModule())
-                    .setSerializationInclusion(JsonInclude.Include.NON_ABSENT)
-                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    private static final ObjectMapper mapper = new ObjectMapper()
+            .registerModule(new GuavaModule())
+            .registerModule(new Jdk8Module())
+            .registerModule(new JavaTimeModule())
+            .setSerializationInclusion(JsonInclude.Include.NON_ABSENT)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
     private static final HttpClient httpClient = HttpClient.newBuilder().build();
 
@@ -32,8 +31,7 @@ public final class ObjectHttpClient {
                 .flatMapResult(response -> convertResponse(response, responseClass));
     }
 
-    public <Response> Result<Response, HttpError> get(
-            Endpoint endpoint, Class<Response> responseClass) {
+    public <Response> Result<Response, HttpError> get(Endpoint endpoint, Class<Response> responseClass) {
         return send(newJsonRequest(endpoint).GET().build())
                 .flatMapResult(response -> convertResponse(response, responseClass));
     }
@@ -42,26 +40,21 @@ public final class ObjectHttpClient {
             Endpoint endpoint, String filename, String fileContent, Class<Response> responseClass) {
         Forms.MultipartUpload upload = Forms.MultipartUpload.of(filename, fileContent);
 
-        HttpRequest.Builder requestBuilder =
-                HttpRequest.newBuilder()
-                        .uri(endpoint.uri())
-                        .setHeader(
-                                HttpHeaders.CONTENT_TYPE,
-                                "multipart/form-data; boundary=" + upload.boundary())
-                        .setHeader(HttpHeaders.ACCEPT, "application/json")
-                        .POST(HttpRequest.BodyPublishers.ofString(upload.content()));
+        HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .uri(endpoint.uri())
+                .setHeader(HttpHeaders.CONTENT_TYPE, "multipart/form-data; boundary=" + upload.boundary())
+                .setHeader(HttpHeaders.ACCEPT, "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(upload.content()));
         endpoint.headers().forEach(requestBuilder::setHeader);
 
-        return send(requestBuilder.build())
-                .flatMapResult(httpResp -> convertResponse(httpResp, responseClass));
+        return send(requestBuilder.build()).flatMapResult(httpResp -> convertResponse(httpResp, responseClass));
     }
 
     private HttpRequest.Builder newJsonRequest(Endpoint endpoint) {
-        HttpRequest.Builder builder =
-                HttpRequest.newBuilder()
-                        .uri(endpoint.uri())
-                        .setHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8")
-                        .setHeader(HttpHeaders.ACCEPT, "application/json");
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(endpoint.uri())
+                .setHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8")
+                .setHeader(HttpHeaders.ACCEPT, "application/json");
         endpoint.headers().forEach(builder::setHeader);
         return builder;
     }
@@ -71,8 +64,7 @@ public final class ObjectHttpClient {
             return Result.ok(HttpRequest.BodyPublishers.ofString(""));
         }
         try {
-            return Result.ok(
-                    HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(request)));
+            return Result.ok(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(request)));
         } catch (JsonProcessingException jpe) {
             return HttpError.of("Unable to serialize request body", jpe);
         }

@@ -21,13 +21,10 @@ public final class Forms {
         @VisibleForTesting
         static MultipartUpload format(String filename, String fileContent, String boundary) {
             String marker = "--" + boundary + "\r\n";
-            String header =
-                    marker
-                            + ("Content-Disposition: form-data; name=\"file\"; filename=\""
-                                    + filename
-                                    + "\"\r\n")
-                            + "Content-Type: application/octet-stream\r\n"
-                            + "\r\n";
+            String header = marker
+                    + ("Content-Disposition: form-data; name=\"file\"; filename=\"" + filename + "\"\r\n")
+                    + "Content-Type: application/octet-stream\r\n"
+                    + "\r\n";
             String terminator = "\r\n--" + boundary + "--";
             String content = header + fileContent + terminator;
             return new MultipartUpload(boundary, content);
@@ -40,8 +37,6 @@ public final class Forms {
 
     private static String encode(Map<String, String> params) {
         Escaper escaper = UrlEscapers.urlFormParameterEscaper();
-        return Joiner.on("&")
-                .withKeyValueSeparator("=")
-                .join(Maps.transformValues(params, escaper::escape));
+        return Joiner.on("&").withKeyValueSeparator("=").join(Maps.transformValues(params, escaper::escape));
     }
 }
