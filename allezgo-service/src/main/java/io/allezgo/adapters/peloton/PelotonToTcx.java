@@ -19,8 +19,7 @@ import java.util.List;
 public final class PelotonToTcx {
     private PelotonToTcx() {}
 
-    public static Tcx convertToTcx(
-            PelotonActivity activity, Ride ride, PerformanceSummary metrics) {
+    public static Tcx convertToTcx(PelotonActivity activity, Ride ride, PerformanceSummary metrics) {
         ImmutableMap<String, PerformanceSummary.Metric> metricMap =
                 Maps.uniqueIndex(metrics.metrics(), PerformanceSummary.Metric::name);
         ImmutableMap<String, PerformanceSummary.Summary> summaryMap =
@@ -28,12 +27,12 @@ public final class PelotonToTcx {
 
         Instant start = Instant.ofEpochSecond(activity.startTime());
 
-        List<TrainingCenterDatabase.Lap> laps = new ArrayList<>(metrics.segments().size());
+        List<TrainingCenterDatabase.Lap> laps =
+                new ArrayList<>(metrics.segments().size());
 
-        List<Ride.Segment> segmentsByStartTime =
-                metrics.segments().stream()
-                        .sorted(Comparator.comparing(s -> s.startTime().value()))
-                        .toList();
+        List<Ride.Segment> segmentsByStartTime = metrics.segments().stream()
+                .sorted(Comparator.comparing(s -> s.startTime().value()))
+                .toList();
 
         double cumulativeDistance = 0.0;
         for (Ride.Segment segment : segmentsByStartTime) {
@@ -42,10 +41,9 @@ public final class PelotonToTcx {
 
             // TODO(markelliot): this assumes ticks are seconds, which isn't quite right
             int startTick = (int) segment.startTime().value();
-            int endTick =
-                    Math.min(
-                            startTick + (int) segment.length().value() - 1,
-                            metrics.ticks().size() - 1);
+            int endTick = Math.min(
+                    startTick + (int) segment.length().value() - 1,
+                    metrics.ticks().size() - 1);
 
             if (startTick >= metrics.ticks().size()) {
                 // this means the metrics data ends early
@@ -59,16 +57,15 @@ public final class PelotonToTcx {
                 // won't count moving time until it sees at least the first tick
                 // (we use non-zero HR/Cadence/Speed/Power because picking 0 for these things might
                 //  be a litte weird)
-                trackpoints.add(
-                        new TrainingCenterDatabase.Trackpoint(
-                                start.plusSeconds(0),
-                                BeatsPerMinute.of(
-                                        metricMap.get("Heart Rate").values().get(0).intValue()),
-                                RevolutionsPerMinute.of(
-                                        metricMap.get("Cadence").values().get(0).intValue()),
-                                MilesPerHour.of(metricMap.get("Speed").values().get(0)),
-                                Watts.of(metricMap.get("Output").values().get(0)),
-                                Miles.of(0.0)));
+                trackpoints.add(new TrainingCenterDatabase.Trackpoint(
+                        start.plusSeconds(0),
+                        BeatsPerMinute.of(
+                                metricMap.get("Heart Rate").values().get(0).intValue()),
+                        RevolutionsPerMinute.of(
+                                metricMap.get("Cadence").values().get(0).intValue()),
+                        MilesPerHour.of(metricMap.get("Speed").values().get(0)),
+                        Watts.of(metricMap.get("Output").values().get(0)),
+                        Miles.of(0.0)));
             }
 
             for (int i = startTick; i <= endTick; i++) {
@@ -76,34 +73,28 @@ public final class PelotonToTcx {
                         metrics.ticks().get(i) - ((i > 0) ? metrics.ticks().get(i - 1) : 0);
                 cumulativeDistance += metricMap.get("Speed").values().get(i) * seconds / 3600.0;
 
-                trackpoints.add(
-                        new TrainingCenterDatabase.Trackpoint(
-                                start.plusSeconds(metrics.ticks().get(i)),
-                                BeatsPerMinute.of(
-                                        metricMap.get("Heart Rate").values().get(i).intValue()),
-                                RevolutionsPerMinute.of(
-                                        metricMap.get("Cadence").values().get(i).intValue()),
-                                MilesPerHour.of(metricMap.get("Speed").values().get(i)),
-                                Watts.of(metricMap.get("Output").values().get(i)),
-                                Miles.of(cumulativeDistance)));
+                trackpoints.add(new TrainingCenterDatabase.Trackpoint(
+                        start.plusSeconds(metrics.ticks().get(i)),
+                        BeatsPerMinute.of(
+                                metricMap.get("Heart Rate").values().get(i).intValue()),
+                        RevolutionsPerMinute.of(
+                                metricMap.get("Cadence").values().get(i).intValue()),
+                        MilesPerHour.of(metricMap.get("Speed").values().get(i)),
+                        Watts.of(metricMap.get("Output").values().get(i)),
+                        Miles.of(cumulativeDistance)));
             }
 
             Instant lapStart = start.plusSeconds(metrics.ticks().get(startTick));
-            Seconds duration =
-                    Seconds.of(
-                            (long) metrics.ticks().get(endTick)
-                                    - metrics.ticks().get(startTick)
-                                    + 1);
+            Seconds duration = Seconds.of(
+                    (long) metrics.ticks().get(endTick) - metrics.ticks().get(startTick) + 1);
 
             // TODO(markelliot): assume linear calorie assignment, which is pretty bogus -- we
             // should work out how Peloton converts effort to calories (HR?) and then do that
             // calculation ourselves
             Calories caloriePortion =
-                    Calories.of(
-                            (int)
-                                    (summaryMap.get("Calories").value()
-                                            * (double) duration.value()
-                                            / (double) ride.ride().duration().value()));
+                    Calories.of((int) (summaryMap.get("Calories").value()
+                            * (double) duration.value()
+                            / (double) ride.ride().duration().value()));
 
             TrainingCenterDatabase.Lap lap =
                     new TrainingCenterDatabase.Lap(lapStart, duration, caloriePortion, trackpoints);

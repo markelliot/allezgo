@@ -22,18 +22,14 @@ public final class PelotonClient {
 
     public PelotonClient(Configuration.Peloton conf) {
         this.session =
-                Suppliers.memoize(
-                        () ->
-                                login(conf.email(), conf.password())
-                                        .orElseThrow(HttpError::toException));
+                Suppliers.memoize(() -> login(conf.email(), conf.password()).orElseThrow(HttpError::toException));
     }
 
     private Result<PelotonSession, HttpError> login(String email, String password) {
-        Result<PelotonLoginResponse, HttpError> response =
-                client.post(
-                        base.path("auth", "login").build(),
-                        PelotonLoginRequest.of(email, password),
-                        PelotonLoginResponse.class);
+        Result<PelotonLoginResponse, HttpError> response = client.post(
+                base.path("auth", "login").build(),
+                PelotonLoginRequest.of(email, password),
+                PelotonLoginResponse.class);
 
         return response.mapResult(r -> new PelotonSession(r.sessionId(), r.userId()));
     }
@@ -81,8 +77,7 @@ public final class PelotonClient {
                                     return currentPageIter.next();
                                 }
                                 page++;
-                                activities =
-                                        activities(page, 100).orElseThrow(HttpError::toException);
+                                activities = activities(page, 100).orElseThrow(HttpError::toException);
                                 currentPageIter = activities.data().iterator();
                                 return currentPageIter.next();
                             }

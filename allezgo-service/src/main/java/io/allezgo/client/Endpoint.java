@@ -11,19 +11,17 @@ public final class Endpoint {
     private final URI uri;
     private final ImmutableMap<String, String> headers;
 
-    private Endpoint(
-            URI uri, ImmutableMap<String, String> query, ImmutableMap<String, String> headers) {
+    private Endpoint(URI uri, ImmutableMap<String, String> query, ImmutableMap<String, String> headers) {
         String queryString = Joiner.on("&").withKeyValueSeparator("=").join(query);
         try {
-            this.uri =
-                    new URI(
-                            uri.getScheme(),
-                            uri.getUserInfo(),
-                            uri.getHost(),
-                            uri.getPort(),
-                            uri.getPath(),
-                            queryString,
-                            uri.getFragment());
+            this.uri = new URI(
+                    uri.getScheme(),
+                    uri.getUserInfo(),
+                    uri.getHost(),
+                    uri.getPort(),
+                    uri.getPath(),
+                    queryString,
+                    uri.getFragment());
         } catch (URISyntaxException e) {
             throw new IllegalStateException("Illegal URI syntax", e);
         }
@@ -46,8 +44,7 @@ public final class Endpoint {
         private final URI base;
 
         private Base(URI base) {
-            Preconditions.checkArgument(
-                    base.getQuery() == null, "query parameters must be added using the Builder");
+            Preconditions.checkArgument(base.getQuery() == null, "query parameters must be added using the Builder");
             this.base = base;
         }
 

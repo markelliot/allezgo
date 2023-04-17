@@ -47,34 +47,26 @@ public final class SyncPelotonToGarmin {
         }
 
         PelotonClient peloton =
-                new PelotonClient(
-                        new Configuration.Peloton(request.pelotonEmail, request.pelotonPassword));
+                new PelotonClient(new Configuration.Peloton(request.pelotonEmail, request.pelotonPassword));
 
         try (Span ignored = Spans.forCurrentTrace("validatePelotonLogin")) {
             if (!peloton.validateLogin()) {
-                return new Response(
-                        null, "Unable to login to Peloton with the provided credentials");
+                return new Response(null, "Unable to login to Peloton with the provided credentials");
             }
         }
 
-        GarminClient garmin =
-                new GarminClient(
-                        new Configuration.Garmin(
-                                request.garminEmail,
-                                request.garminPassword,
-                                request.garminPelotonGearName));
+        GarminClient garmin = new GarminClient(
+                new Configuration.Garmin(request.garminEmail, request.garminPassword, request.garminPelotonGearName));
 
         try (Span ignored = Spans.forCurrentTrace("validateGarminLogin")) {
             if (!garmin.validateLogin()) {
-                return new Response(
-                        null, "Unable to login to Garmin with the provided credentials");
+                return new Response(null, "Unable to login to Garmin with the provided credentials");
             }
         }
 
         try (Span ignored = Spans.forCurrentTrace("sendHoneycombEvent")) {
             Events.record(
-                    PelotonToGarminSyncEvent.of(
-                            request.pelotonEmail, request.garminEmail, request.numDaysToSync));
+                    PelotonToGarminSyncEvent.of(request.pelotonEmail, request.garminEmail, request.numDaysToSync));
         }
 
         List<SyncRecord> lastNDays = null;
@@ -124,34 +116,27 @@ public final class SyncPelotonToGarmin {
 
     public record Response(List<SyncRecord> result, String error) {}
 
-    private static List<SyncRecord> syncLastNDays(
-            PelotonClient peloton, GarminClient garmin, int numDays) {
+    private static List<SyncRecord> syncLastNDays(PelotonClient peloton, GarminClient garmin, int numDays) {
         Instant thirtyDaysAgo = Instant.now().minus(Period.ofDays(numDays));
 
         List<GarminActivity> garminActivitiesLastMonth;
         try (Span ignored = Spans.forCurrentTrace("garminActivitiesLastMonth")) {
-            garminActivitiesLastMonth =
-                    garmin.activitiesAsStream()
-                            .takeWhile(ga -> ga.tcxId().isAfter(thirtyDaysAgo))
-                            .toList();
+            garminActivitiesLastMonth = garmin.activitiesAsStream()
+                    .takeWhile(ga -> ga.tcxId().isAfter(thirtyDaysAgo))
+                    .toList();
         }
 
         return peloton.activitiesAsStream()
                 .takeWhile(pa -> pa.tcxId().isAfter(thirtyDaysAgo))
-                .filter(
-                        pelotonActivity ->
-                                pelotonActivity
-                                        .fitnessDiscipline()
-                                        .equals(PelotonActivity.FITNESS_DISCIPLINE_CYCLING))
+                .filter(pelotonActivity ->
+                        pelotonActivity.fitnessDiscipline().equals(PelotonActivity.FITNESS_DISCIPLINE_CYCLING))
                 .filter(pelotonActivity -> pelotonActivity.ride().isPresent())
-                .map(
-                        pelotonActivity ->
-                                findOrSync(
-                                        peloton,
-                                        garmin,
-                                        pelotonActivity,
-                                        pelotonActivity.ride().get(),
-                                        garminActivitiesLastMonth.stream()))
+                .map(pelotonActivity -> findOrSync(
+                        peloton,
+                        garmin,
+                        pelotonActivity,
+                        pelotonActivity.ride().get(),
+                        garminActivitiesLastMonth.stream()))
                 .toList();
     }
 
@@ -164,10 +149,9 @@ public final class SyncPelotonToGarmin {
         Optional<GarminActivity> matchedGarminActivity =
                 findMatchingGarminActivity(garminActivities, pelotonRide.tcxId());
 
-        GarminActivityId garminActivityId =
-                matchedGarminActivity
-                        .map(GarminActivity::activityId)
-                        .orElseGet(() -> uploadRideToGarmin(peloton, garmin, pelotonRide));
+        GarminActivityId garminActivityId = matchedGarminActivity
+                .map(GarminActivity::activityId)
+                .orElseGet(() -> uploadRideToGarmin(peloton, garmin, pelotonRide));
 
         return new SyncRecord(
                 getActivityDate(pelotonRide),
@@ -180,22 +164,17 @@ public final class SyncPelotonToGarmin {
 
     private static GarminActivityId uploadRideToGarmin(
             PelotonClient peloton, GarminClient garmin, PelotonActivity lastPelotonRide) {
-        Ride rideDetails =
-                peloton.ride(lastPelotonRide.ride().get()).orElseThrow(HttpError::toException);
-        PerformanceSummary metrics =
-                peloton.metrics(lastPelotonRide.id()).orElseThrow(HttpError::toException);
+        Ride rideDetails = peloton.ride(lastPelotonRide.ride().get()).orElseThrow(HttpError::toException);
+        PerformanceSummary metrics = peloton.metrics(lastPelotonRide.id()).orElseThrow(HttpError::toException);
         Tcx tcx = PelotonToTcx.convertToTcx(lastPelotonRide, rideDetails, metrics);
 
-        GarminActivityId garminActivityId =
-                garmin.uploadTcx(tcx).orElseThrow(HttpError::toException);
+        GarminActivityId garminActivityId = garmin.uploadTcx(tcx).orElseThrow(HttpError::toException);
 
         String title = rideDetails.ride().titleWithInstructor();
         String description = rideDetails.ride().description();
-        garmin.updateActivity(garminActivityId, title, description)
-                .orElseThrow(HttpError::toException);
+        garmin.updateActivity(garminActivityId, title, description).orElseThrow(HttpError::toException);
 
-        garmin.setNamedGear(
-                garminActivityId, getActivityDate(lastPelotonRide), garmin.pelotonGear());
+        garmin.setNamedGear(garminActivityId, getActivityDate(lastPelotonRide), garmin.pelotonGear());
 
         return garminActivityId;
     }
@@ -215,12 +194,11 @@ public final class SyncPelotonToGarmin {
             Stream<GarminActivity> garminActivities, Instant activityStart) {
         return garminActivities
                 .takeWhile(ga -> ga.tcxId().isAfter(activityStart.minusSeconds(120L)))
-                .filter(
-                        ga -> {
-                            Instant gId = ga.tcxId();
-                            return gId.isAfter(activityStart.minusSeconds(120L))
-                                    && gId.isBefore(activityStart.plusSeconds(120L));
-                        })
+                .filter(ga -> {
+                    Instant gId = ga.tcxId();
+                    return gId.isAfter(activityStart.minusSeconds(120L))
+                            && gId.isBefore(activityStart.plusSeconds(120L));
+                })
                 .findFirst();
     }
 }

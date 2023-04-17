@@ -12,7 +12,9 @@ public final class Events {
 
     public static void record(Event event) {
         client.post(
-                events.path(event.type()).header("X-Honeycomb-Team", BEELINE_API_KEY).build(),
+                events.path(event.type())
+                        .header("X-Honeycomb-Team", BEELINE_API_KEY)
+                        .build(),
                 event,
                 EventResponse.class);
     }

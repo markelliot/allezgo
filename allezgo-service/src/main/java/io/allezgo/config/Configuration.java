@@ -13,16 +13,14 @@ import java.io.File;
 import java.io.IOException;
 
 public record Configuration(Peloton peloton, Garmin garmin) {
-    private static final ObjectMapper yamlMapper =
-            new ObjectMapper(
-                            new YAMLFactory()
-                                    .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
-                                    .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
-                    .registerModule(new GuavaModule())
-                    .registerModule(new Jdk8Module())
-                    .registerModule(new JavaTimeModule())
-                    .setSerializationInclusion(JsonInclude.Include.NON_ABSENT)
-                    .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+    private static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory()
+                    .disable(YAMLGenerator.Feature.WRITE_DOC_START_MARKER)
+                    .enable(YAMLGenerator.Feature.MINIMIZE_QUOTES))
+            .registerModule(new GuavaModule())
+            .registerModule(new Jdk8Module())
+            .registerModule(new JavaTimeModule())
+            .setSerializationInclusion(JsonInclude.Include.NON_ABSENT)
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     private static final File DEFAULT_FILE = new File(System.getProperty("user.home"), ".allezgo");
 
     public static File defaultFile() {
@@ -42,11 +40,9 @@ public record Configuration(Peloton peloton, Garmin garmin) {
     }
 
     public static String renderExample() {
-        Configuration example =
-                new Configuration(
-                        new Configuration.Peloton("<email>", "<password>"),
-                        new Configuration.Garmin(
-                                "<email>", "<password>", "<name of Peloton gear>"));
+        Configuration example = new Configuration(
+                new Configuration.Peloton("<email>", "<password>"),
+                new Configuration.Garmin("<email>", "<password>", "<name of Peloton gear>"));
         try {
             return yamlMapper.writeValueAsString(example);
         } catch (JsonProcessingException e) {
