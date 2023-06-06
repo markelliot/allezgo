@@ -20,6 +20,10 @@ task("printVersion") {
     }
 }
 
+tasks.updateGradleWrapper {
+    enabled = false
+}
+
 allprojects {
     group = "io.allezgo.service"
     version = rootProject.version
