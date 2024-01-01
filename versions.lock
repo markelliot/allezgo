@@ -17,7 +17,7 @@ com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (3 c
 com.jakewharton.nopen:nopen-annotations:1.0.1 (5 constraints: 34455f35)
 com.markelliot.barista:barista:0.70.0 (1 constraints: 39053b3b)
 com.markelliot.barista:barista-annotations:0.70.0 (1 constraints: 39053b3b)
-com.markelliot.barista.tracing:barista-tracing:0.52.0 (3 constraints: 5a254c29)
+com.markelliot.barista.tracing:barista-tracing:0.53.0 (3 constraints: 5b25ab29)
 com.markelliot.result:result:0.52.0 (3 constraints: 5a254c29)
 io.undertow:undertow-core:2.3.10.Final (3 constraints: 6c2bfbe4)
 org.apache.logging.log4j:log4j-api:2.22.1 (5 constraints: 3a4e73fc)
