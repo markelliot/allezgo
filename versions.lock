@@ -10,13 +10,13 @@ com.fasterxml.jackson.core:jackson-core:2.20.0 (9 constraints: afa4732d)
 
 com.fasterxml.jackson.core:jackson-databind:2.20.0 (9 constraints: 619796e1)
 
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0 (4 constraints: ba33297d)
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.20.0 (4 constraints: 1834f7b8)
 
-com.fasterxml.jackson.datatype:jackson-datatype-guava:2.20.0 (4 constraints: ba33297d)
+com.fasterxml.jackson.datatype:jackson-datatype-guava:2.20.0 (4 constraints: 1834f7b8)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.0 (4 constraints: ba33297d)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.20.0 (4 constraints: 1834f7b8)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0 (4 constraints: ba33297d)
+com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.20.0 (4 constraints: 1834f7b8)
 
 com.github.ben-manes.caffeine:caffeine:3.2.2 (3 constraints: ca2464d1)
 
