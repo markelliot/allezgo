@@ -4,7 +4,7 @@ com.auth0:java-jwt:4.5.0 (3 constraints: ce2469d2)
 
 com.fasterxml.jackson:jackson-bom:2.20.0 (8 constraints: 6d9e31dd)
 
-com.fasterxml.jackson.core:jackson-annotations:2.20 (6 constraints: f16c0896)
+com.fasterxml.jackson.core:jackson-annotations:2.20 (7 constraints: c8712e95)
 
 com.fasterxml.jackson.core:jackson-core:2.20.0 (9 constraints: aba4ff2c)
 
