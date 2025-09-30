@@ -1,6 +1,7 @@
 package io.allezgo;
 
 import com.markelliot.barista.Server;
+import com.markelliot.barista.endpoints.EndpointRuntime;
 import com.markelliot.barista.tracing.Spans;
 import io.allezgo.endpoints.SyncPelotonToGarmin;
 import io.allezgo.endpoints.SyncPelotonToGarminEndpoints;
@@ -19,7 +20,8 @@ public final class Main {
 
         Server.builder()
                 .disableTls() // our host provides this for us
-                .endpoints(new SyncPelotonToGarminEndpoints(new SyncPelotonToGarmin()))
+                .endpoints(
+                        new SyncPelotonToGarminEndpoints<>(new SyncPelotonToGarmin(), EndpointRuntime.createDefault()))
                 .allowOrigin("https://allezgo.io")
                 .allowOrigin("http://localhost:8080") // for development
                 .tracingRate(1.0)
