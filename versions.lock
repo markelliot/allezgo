@@ -66,7 +66,7 @@ org.apache.logging.log4j:log4j-jul:2.25.1 (2 constraints: 2820850e)
 
 org.apache.logging.log4j:log4j-slf4j2-impl:2.25.1 (2 constraints: 2820850e)
 
-org.immutables:value:2.11.4 (3 constraints: 5525f728)
+org.immutables:value:2.11.6 (3 constraints: 5725b129)
 
 org.jboss.logging:jboss-logging:3.6.1.Final (9 constraints: bba7bd7d)
 
