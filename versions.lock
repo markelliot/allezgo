@@ -38,7 +38,7 @@ com.markelliot.barista:barista-annotations:0.125.0 (1 constraints: 6a059f40)
 
 com.markelliot.barista.tracing:barista-tracing:0.131.0 (3 constraints: e2255981)
 
-com.markelliot.result:result:0.132.0 (3 constraints: e625cf81)
+com.markelliot.result:result:0.133.0 (3 constraints: e8259182)
 
 io.smallrye.common:smallrye-common-annotation:2.14.0 (3 constraints: 132e7677)
 
@@ -90,9 +90,9 @@ org.yaml:snakeyaml:2.5 (3 constraints: 4436484a)
 
 [Test dependencies]
 
-net.bytebuddy:byte-buddy:1.18.3 (2 constraints: 711892b8)
+net.bytebuddy:byte-buddy:1.18.3 (2 constraints: 6e182bb8)
 
-org.assertj:assertj-core:3.27.7 (2 constraints: 6512ae1e)
+org.assertj:assertj-core:3.27.7 (2 constraints: 6612af1e)
 
 org.junit:junit-bom:6.0.3 (6 constraints: c55a8f0e)
 
