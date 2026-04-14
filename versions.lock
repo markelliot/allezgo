@@ -20,11 +20,11 @@ com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.2 (4 constraints: 0e
 
 com.github.ben-manes.caffeine:caffeine:3.2.3 (3 constraints: cd24f4d1)
 
-com.google.errorprone:error_prone_annotations:2.43.0 (4 constraints: 9c3a1806)
+com.google.errorprone:error_prone_annotations:2.47.0 (4 constraints: a23a5208)
 
 com.google.guava:failureaccess:1.0.3 (3 constraints: d1294d16)
 
-com.google.guava:guava:33.5.0-jre (4 constraints: 6041db37)
+com.google.guava:guava:33.6.0-jre (4 constraints: 61418738)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (3 constraints: c65279e4)
 
