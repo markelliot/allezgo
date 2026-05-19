@@ -13,7 +13,9 @@ public record PerformanceSummary(
         @JsonProperty("summaries") List<Summary> summaries) {
 
     public record Average(
-            @JsonProperty("display_name") String name, @JsonProperty("display_unit") String unit, int value) {}
+            @JsonProperty("display_name") String name,
+            @JsonProperty("display_unit") String unit,
+            int value) {}
 
     public record Metric(
             @JsonProperty("display_name") String name,
@@ -23,5 +25,7 @@ public record PerformanceSummary(
             List<Double> values) {}
 
     public record Summary(
-            @JsonProperty("display_name") String name, @JsonProperty("display_unit") String unit, int value) {}
+            @JsonProperty("display_name") String name,
+            @JsonProperty("display_unit") String unit,
+            int value) {}
 }
