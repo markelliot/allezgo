@@ -45,8 +45,7 @@ public final class TrainingCenterDatabase {
                 "{speed}", trackpoint.speed.toMetersPerSecond(),
                 "{power}", (int) trackpoint.power.value(),
                 "{distance}", trackpoint.distance.toMeters());
-        return substitute(
-                """
+        return substitute("""
                 <Trackpoint>
                   <Time>{time}</Time>
                   <DistanceMeters>{distance}</DistanceMeters>
@@ -61,8 +60,7 @@ public final class TrainingCenterDatabase {
                     </ns3:TPX>
                   </Extensions>
                 </Trackpoint>
-                """,
-                params);
+                """, params);
     }
 
     public static String renderLaps(Lap lap) {
@@ -124,8 +122,7 @@ public final class TrainingCenterDatabase {
                                 .collect(Collectors.joining())
                                 .indent(4))
                 .build();
-        return substitute(
-                """
+        return substitute("""
                 <Lap StartTime="{startTime}">
                   <TotalTimeSeconds>{totalTimeSeconds}</TotalTimeSeconds>
                   <DistanceMeters>{distance}</DistanceMeters>
@@ -152,8 +149,7 @@ public final class TrainingCenterDatabase {
                     </ns3:LX>
                   </Extensions>
                 </Lap>
-                """,
-                params);
+                """, params);
     }
 
     public static Tcx render(String className, Instant start, List<Lap> laps) {
@@ -167,8 +163,7 @@ public final class TrainingCenterDatabase {
                         .indent(6),
                 "{notes}",
                 className);
-        return Tcx.of(substitute(
-                """
+        return Tcx.of(substitute("""
                     <?xml version='1.0' encoding='UTF-8'?>
                     <TrainingCenterDatabase
                       xsi:schemaLocation="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd"
@@ -186,8 +181,7 @@ public final class TrainingCenterDatabase {
                         </Activity>
                       </Activities>
                     </TrainingCenterDatabase>
-                    """,
-                params));
+                    """, params));
     }
 
     private static String substitute(String string, Map<String, Object> substitutions) {
