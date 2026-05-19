@@ -2,21 +2,21 @@
 
 com.auth0:java-jwt:4.5.2 (3 constraints: d4248dd3)
 
-com.fasterxml.jackson:jackson-bom:2.21.3 (8 constraints: 799e57f3)
+com.fasterxml.jackson:jackson-bom:2.21.3 (8 constraints: 7d9ec3f3)
 
 com.fasterxml.jackson.core:jackson-annotations:2.21 (7 constraints: 037193e3)
 
-com.fasterxml.jackson.core:jackson-core:2.21.3 (9 constraints: b3a4303c)
+com.fasterxml.jackson.core:jackson-core:2.21.3 (9 constraints: b7a49c3c)
 
-com.fasterxml.jackson.core:jackson-databind:2.21.3 (9 constraints: 65976ff1)
+com.fasterxml.jackson.core:jackson-databind:2.21.3 (9 constraints: 6997dbf1)
 
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3 (4 constraints: 1034c5ba)
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3 (4 constraints: 143431bb)
 
-com.fasterxml.jackson.datatype:jackson-datatype-guava:2.21.3 (4 constraints: 1034c5ba)
+com.fasterxml.jackson.datatype:jackson-datatype-guava:2.21.3 (4 constraints: 143431bb)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.3 (4 constraints: 1034c5ba)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.3 (4 constraints: 143431bb)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3 (4 constraints: 1034c5ba)
+com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3 (4 constraints: 143431bb)
 
 com.github.ben-manes.caffeine:caffeine:3.2.4 (3 constraints: ce244fd2)
 
@@ -32,13 +32,13 @@ com.google.j2objc:j2objc-annotations:3.1 (3 constraints: b728804e)
 
 com.jakewharton.nopen:nopen-annotations:1.0.1 (5 constraints: 34455f35)
 
-com.markelliot.barista:barista:0.126.0 (1 constraints: 6b05a240)
+com.markelliot.barista:barista:0.128.0 (1 constraints: 6d05a840)
 
-com.markelliot.barista:barista-annotations:0.126.0 (1 constraints: 6b05a240)
+com.markelliot.barista:barista-annotations:0.128.0 (1 constraints: 6d05a840)
 
-com.markelliot.barista.tracing:barista-tracing:0.133.0 (3 constraints: e6255682)
+com.markelliot.barista.tracing:barista-tracing:0.133.0 (3 constraints: e8259182)
 
-com.markelliot.result:result:0.135.0 (3 constraints: ec258e83)
+com.markelliot.result:result:0.135.0 (3 constraints: ee25c983)
 
 io.smallrye.common:smallrye-common-annotation:2.14.0 (3 constraints: 132e7677)
 
@@ -56,7 +56,7 @@ io.smallrye.common:smallrye-common-os:2.4.0 (3 constraints: 702e7266)
 
 io.smallrye.common:smallrye-common-ref:2.4.0 (3 constraints: 702e7266)
 
-io.undertow:undertow-core:2.4.0.Final (3 constraints: 772b70e7)
+io.undertow:undertow-core:2.4.0.Final (3 constraints: 0f2b499b)
 
 org.apache.logging.log4j:log4j-api:2.25.3 (5 constraints: 534e2306)
 
@@ -68,7 +68,7 @@ org.apache.logging.log4j:log4j-slf4j2-impl:2.25.3 (2 constraints: 2c20f10e)
 
 org.immutables:value:2.12.1 (3 constraints: 5725b328)
 
-org.jboss.logging:jboss-logging:3.6.2.Final (9 constraints: bca7357e)
+org.jboss.logging:jboss-logging:3.6.2.Final (9 constraints: bea76481)
 
 org.jboss.threads:jboss-threads:3.9.2 (4 constraints: 17380973)
 
