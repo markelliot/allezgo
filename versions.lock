@@ -8,15 +8,15 @@ com.fasterxml.jackson.core:jackson-annotations:2.21 (7 constraints: 037193e3)
 
 com.fasterxml.jackson.core:jackson-core:2.21.3 (9 constraints: b3a4303c)
 
-com.fasterxml.jackson.core:jackson-databind:2.21.3 (9 constraints: 6497ccef)
+com.fasterxml.jackson.core:jackson-databind:2.21.3 (9 constraints: 65976ff1)
 
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3 (4 constraints: 0f343dba)
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.21.3 (4 constraints: 1034c5ba)
 
-com.fasterxml.jackson.datatype:jackson-datatype-guava:2.21.3 (4 constraints: 0f343dba)
+com.fasterxml.jackson.datatype:jackson-datatype-guava:2.21.3 (4 constraints: 1034c5ba)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.3 (4 constraints: 0f343dba)
+com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.3 (4 constraints: 1034c5ba)
 
-com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3 (4 constraints: 0f343dba)
+com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3 (4 constraints: 1034c5ba)
 
 com.github.ben-manes.caffeine:caffeine:3.2.4 (3 constraints: ce244fd2)
 
