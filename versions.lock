@@ -56,7 +56,7 @@ io.smallrye.common:smallrye-common-os:2.4.0 (3 constraints: 702e7266)
 
 io.smallrye.common:smallrye-common-ref:2.4.0 (3 constraints: 702e7266)
 
-io.undertow:undertow-core:2.4.0.Final (3 constraints: 0f2b499b)
+io.undertow:undertow-core:2.4.1.Final (3 constraints: 102bb69b)
 
 org.apache.logging.log4j:log4j-api:2.25.3 (5 constraints: 534e2306)
 
