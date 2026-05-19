@@ -18,9 +18,9 @@ com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.21.3 (4 constraints: 0f34
 
 com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.21.3 (4 constraints: 0f343dba)
 
-com.github.ben-manes.caffeine:caffeine:3.2.3 (3 constraints: cd24f4d1)
+com.github.ben-manes.caffeine:caffeine:3.2.4 (3 constraints: ce244fd2)
 
-com.google.errorprone:error_prone_annotations:2.47.0 (4 constraints: a23a5208)
+com.google.errorprone:error_prone_annotations:2.49.0 (4 constraints: a83a4c0b)
 
 com.google.guava:failureaccess:1.0.3 (3 constraints: d1294d16)
 
