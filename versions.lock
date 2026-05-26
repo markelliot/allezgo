@@ -36,7 +36,7 @@ com.markelliot.barista:barista:0.128.0 (1 constraints: 6d05a840)
 
 com.markelliot.barista:barista-annotations:0.128.0 (1 constraints: 6d05a840)
 
-com.markelliot.barista.tracing:barista-tracing:0.134.0 (3 constraints: e925f282)
+com.markelliot.barista.tracing:barista-tracing:0.135.0 (3 constraints: ea255383)
 
 com.markelliot.result:result:0.136.0 (3 constraints: ef252a84)
 
