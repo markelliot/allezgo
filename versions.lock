@@ -32,13 +32,13 @@ com.google.j2objc:j2objc-annotations:3.1 (3 constraints: b728804e)
 
 com.jakewharton.nopen:nopen-annotations:1.0.1 (5 constraints: 34455f35)
 
-com.markelliot.barista:barista:0.129.0 (1 constraints: 6e05ab40)
+com.markelliot.barista:barista:0.130.0 (1 constraints: 66059440)
 
-com.markelliot.barista:barista-annotations:0.129.0 (1 constraints: 6e05ab40)
+com.markelliot.barista:barista-annotations:0.130.0 (1 constraints: 66059440)
 
-com.markelliot.barista.tracing:barista-tracing:0.135.0 (3 constraints: ee25c983)
+com.markelliot.barista.tracing:barista-tracing:0.135.0 (3 constraints: f0250484)
 
-com.markelliot.result:result:0.137.0 (3 constraints: f4250185)
+com.markelliot.result:result:0.137.0 (3 constraints: f6253c85)
 
 io.smallrye.common:smallrye-common-annotation:2.14.0 (3 constraints: 132e7677)
 
