@@ -38,7 +38,7 @@ com.markelliot.barista:barista-annotations:0.135.0 (1 constraints: 6b05a340)
 
 com.markelliot.barista.tracing:barista-tracing:0.139.0 (3 constraints: fc257486)
 
-com.markelliot.result:result:0.141.0 (3 constraints: e7253382)
+com.markelliot.result:result:0.142.0 (3 constraints: e8259482)
 
 io.smallrye.common:smallrye-common-annotation:2.14.0 (3 constraints: 132e7677)
 
