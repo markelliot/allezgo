@@ -1,6 +1,6 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.auth0:java-jwt:4.6.0 (3 constraints: d42491d3)
+com.auth0:java-jwt:4.6.0 (3 constraints: d32438d3)
 
 com.fasterxml.jackson:jackson-bom:2.22.1 (8 constraints: 759ec1ed)
 
