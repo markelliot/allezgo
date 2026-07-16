@@ -12,5 +12,5 @@ com.markelliot.result:result = 0.143.0
 io.undertow:undertow-core = 2.4.2.Final
 org.assertj:assertj-core = 3.27.7
 org.immutables:* = 2.12.2
-org.junit:junit-bom = 6.1.1
-org.junit.jupiter:junit-jupiter-engine = 6.1.1
+org.junit:junit-bom = 6.1.2
+org.junit.jupiter:junit-jupiter-engine = 6.1.2
