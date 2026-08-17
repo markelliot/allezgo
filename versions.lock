@@ -20,11 +20,11 @@ com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.22.2 (4 constraints: 12
 
 com.github.ben-manes.caffeine:caffeine:3.2.4 (3 constraints: d02484d2)
 
-com.google.errorprone:error_prone_annotations:2.49.0 (4 constraints: b43aa80c)
+com.google.errorprone:error_prone_annotations:2.50.0 (4 constraints: ae3a6f0a)
 
 com.google.guava:failureaccess:1.0.3 (3 constraints: d1294d16)
 
-com.google.guava:guava:33.6.0-jre (4 constraints: 6341cd38)
+com.google.guava:guava:33.7.0-jre (4 constraints: 64417939)
 
 com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava (3 constraints: c65279e4)
 
@@ -76,7 +76,7 @@ org.jboss.xnio:xnio-api:3.8.16.Final (4 constraints: 3e3f5a7f)
 
 org.jboss.xnio:xnio-nio:3.8.16.Final (3 constraints: 5f32f0bc)
 
-org.jspecify:jspecify:1.0.0 (4 constraints: be39af3f)
+org.jspecify:jspecify:1.0.1 (4 constraints: bf390a40)
 
 org.slf4j:slf4j-api:2.0.18 (3 constraints: 31319386)
 
