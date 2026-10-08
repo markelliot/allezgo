@@ -1,5 +1,5 @@
 com.auth0:java-jwt = 4.6.1
-com.github.ben-manes.caffeine:caffeine = 3.2.4
+com.github.ben-manes.caffeine:caffeine = 3.3.0
 com.fasterxml.jackson.core:jackson-annotations = 2.22
 com.fasterxml.jackson.core:jackson-databind = 2.22.3
 com.fasterxml.jackson.*:* = 2.22.3
