@@ -1,6 +1,6 @@
 # Run ./gradlew writeVersionsLocks to regenerate this file. Blank lines are to minimize merge conflicts.
 
-com.auth0:java-jwt:4.6.2 (3 constraints: d72423d4)
+com.auth0:java-jwt:4.6.2 (3 constraints: d92458d4)
 
 com.fasterxml.jackson:jackson-bom:2.22.4 (8 constraints: 8b9ec1ff)
 
@@ -32,13 +32,13 @@ com.google.j2objc:j2objc-annotations:3.1 (3 constraints: b728804e)
 
 com.jakewharton.nopen:nopen-annotations:1.0.1 (5 constraints: 34455f35)
 
-com.markelliot.barista:barista:0.150.0 (1 constraints: 68059c40)
+com.markelliot.barista:barista:0.151.0 (1 constraints: 69059f40)
 
-com.markelliot.barista:barista-annotations:0.150.0 (1 constraints: 68059c40)
+com.markelliot.barista:barista-annotations:0.151.0 (1 constraints: 69059f40)
 
 com.markelliot.barista.tracing:barista-tracing:0.152.0 (3 constraints: ed256e83)
 
-com.markelliot.result:result:0.155.0 (3 constraints: f225cc84)
+com.markelliot.result:result:0.155.0 (3 constraints: f6254285)
 
 io.smallrye.common:smallrye-common-annotation:2.14.0 (3 constraints: 132e7677)
 
